@@ -39,7 +39,7 @@ func main() {
 	mux.HandleFunc("GET /api/analytics/", handleGetAnalytics(store, cache))
 	mux.HandleFunc("GET /health", handleHealth(store))
 
-	handler := corsMiddleware(tracingMiddleware(mux))
+	handler := loggingMiddleware(corsMiddleware(tracingMiddleware(mux)))
 
 	log.Printf("Analytics service listening on :%s", port)
 	if err := http.ListenAndServe(":"+port, handler); err != nil {

@@ -37,7 +37,7 @@ func main() {
 	// Static files (SPA fallback)
 	mux.Handle("/", staticHandler())
 
-	handler := tracingMiddleware(mux)
+	handler := loggingMiddleware(tracingMiddleware(mux))
 
 	log.Printf("Frontend BFF listening on :%s", port)
 	log.Printf("  API proxy -> %s", apiURL)
