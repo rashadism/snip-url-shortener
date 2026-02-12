@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('username-form').addEventListener('submit', handleLogin);
   document.getElementById('shorten-form').addEventListener('submit', handleShorten);
   document.getElementById('logout-btn').addEventListener('click', handleLogout);
+  document.getElementById('analytics-logout-btn').addEventListener('click', handleLogout);
 
   if (currentUser) {
     navigateTo('dashboard');
@@ -25,6 +26,18 @@ function navigateTo(view, data) {
   } else if (view === 'analytics' && data) {
     document.getElementById('analytics-username').textContent = currentUser;
     loadAnalytics(data.code);
+  }
+}
+
+// Tab switching
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelector(`.tab[data-tab="${tab}"]`).classList.add('active');
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+
+  if (tab === 'top-urls') {
+    loadTopURLs();
   }
 }
 
@@ -81,16 +94,22 @@ async function handleShorten(e) {
 
     const shortURL = window.location.origin + '/r/' + data.short_code;
     resultDiv.innerHTML = `
-      <span class="short-url">${shortURL}</span>
-      <div>
+      <div class="result-info">
+        <span class="result-label">snipped!</span>
+        <a class="short-url" href="/r/${escapeAttr(data.short_code)}" target="_blank">${escapeHtml(shortURL)}</a>
+      </div>
+      <div class="result-actions">
         <span class="copy-feedback" id="copy-feedback">copied!</span>
-        <button class="btn btn-sm btn-accent" onclick="copyURL('${shortURL}')">copy</button>
+        <button type="button" class="btn-icon" onclick="copyURL('${escapeAttr(shortURL)}')" title="Copy">${icons.copy}</button>
+        <a class="btn-icon" href="/r/${escapeAttr(data.short_code)}" target="_blank" title="Visit">${icons.visit}</a>
       </div>
     `;
     resultDiv.classList.remove('hidden');
     urlInput.value = '';
     slugInput.value = '';
     loadURLs();
+    // Re-fetch after a delay so async metadata (title/favicon) shows up
+    setTimeout(loadURLs, 3000);
   } catch (err) {
     errorDiv.textContent = 'Network error — is the server running?';
     errorDiv.classList.remove('hidden');
@@ -100,12 +119,14 @@ async function handleShorten(e) {
 function copyURL(url) {
   navigator.clipboard.writeText(url).then(() => {
     const fb = document.getElementById('copy-feedback');
-    fb.classList.add('show');
-    setTimeout(() => fb.classList.remove('show'), 1500);
+    if (fb) {
+      fb.classList.add('show');
+      setTimeout(() => fb.classList.remove('show'), 1500);
+    }
   });
 }
 
-// Load URLs
+// Load user's URLs
 async function loadURLs() {
   const list = document.getElementById('urls-list');
 
@@ -118,34 +139,70 @@ async function loadURLs() {
       return;
     }
 
-    list.innerHTML = urls.map((u, i) => {
-      const favicon = u.favicon_url
-        ? `<img class="favicon" src="${escapeHtml(u.favicon_url)}" alt="" onerror="this.style.display='none'">`
-        : '<div class="favicon" style="background:var(--border);"></div>';
-
-      const title = u.title
-        ? `<div class="url-card-title">${escapeHtml(u.title)}</div>`
-        : '';
-
-      return `
-        <div class="url-card" style="animation-delay: ${i * 0.05}s">
-          ${favicon}
-          <div class="url-card-info">
-            <div class="url-card-code">/r/${escapeHtml(u.short_code)}</div>
-            ${title}
-            <div class="url-card-original">${escapeHtml(u.original_url)}</div>
-          </div>
-          <div class="url-card-actions">
-            <span class="click-count" onclick="navigateTo('analytics', {code: '${u.short_code}'})">${u.click_count} clicks</span>
-            <button class="btn btn-sm btn-accent" onclick="copyURL('${window.location.origin}/r/${u.short_code}')">copy</button>
-            <button class="btn btn-sm btn-danger" onclick="deleteURL('${u.short_code}')">delete</button>
-          </div>
-        </div>
-      `;
-    }).join('');
+    list.innerHTML = urls.map((u, i) => renderURLCard(u, i, true)).join('');
   } catch (err) {
     list.innerHTML = '<p class="empty-state">failed to load URLs</p>';
   }
+}
+
+// Load top URLs (global)
+async function loadTopURLs() {
+  const list = document.getElementById('top-urls-list');
+  list.innerHTML = '<div class="loading">loading...</div>';
+
+  try {
+    const resp = await fetch('/api/analytics/top');
+    const data = await resp.json();
+
+    if (!data.urls || data.urls.length === 0) {
+      list.innerHTML = '<p class="empty-state">no URLs yet</p>';
+      return;
+    }
+
+    list.innerHTML = data.urls.map((u, i) => renderURLCard(u, i, false)).join('');
+  } catch (err) {
+    list.innerHTML = '<p class="empty-state">failed to load top URLs</p>';
+  }
+}
+
+// Shared URL card renderer
+function renderURLCard(u, index, showActions) {
+  const favicon = u.favicon_url
+    ? `<img class="favicon" src="${escapeAttr(u.favicon_url)}" alt="" onerror="this.style.display='none'">`
+    : '<div class="favicon" style="background:var(--border);"></div>';
+
+  const title = u.title
+    ? `<div class="url-card-title">${escapeHtml(u.title)}</div>`
+    : '';
+
+  const shortPath = '/r/' + escapeHtml(u.short_code);
+  const shortURL = window.location.origin + shortPath;
+
+  const ownerBadge = !showActions && u.username
+    ? `<span class="owner-badge">${escapeHtml(u.username)}</span>`
+    : '';
+
+  const deleteBtn = showActions
+    ? `<button type="button" class="btn-icon btn-icon-danger" onclick="deleteURL('${escapeAttr(u.short_code)}')" title="Delete">${icons.delete}</button>`
+    : '';
+
+  return `
+    <div class="url-card" style="animation-delay: ${index * 0.05}s">
+      ${favicon}
+      <div class="url-card-info">
+        <div class="url-card-original">${escapeHtml(u.original_url)}</div>
+        ${title}
+        <a class="url-card-code" href="${shortPath}" target="_blank">${shortURL}</a>
+      </div>
+      <div class="url-card-actions">
+        ${ownerBadge}
+        <span class="click-count" onclick="navigateTo('analytics', {code: '${escapeAttr(u.short_code)}'})">${u.click_count} clicks</span>
+        <button type="button" class="btn-icon" onclick="copyURL('${escapeAttr(shortURL)}')" title="Copy">${icons.copy}</button>
+        <a class="btn-icon" href="${shortPath}" target="_blank" title="Visit">${icons.visit}</a>
+        ${deleteBtn}
+      </div>
+    </div>
+  `;
 }
 
 // Delete URL
@@ -185,10 +242,11 @@ async function loadAnalytics(code) {
       : '<p class="empty-state">no clicks yet</p>';
 
     const createdAt = new Date(data.created_at);
+    const shortPath = '/r/' + escapeHtml(data.short_code);
 
     content.innerHTML = `
       <div class="analytics-header">
-        <h2>/r/${escapeHtml(data.short_code)}</h2>
+        <h2><a href="${shortPath}" target="_blank" style="color:var(--accent);text-decoration:none">${shortPath}</a></h2>
         ${data.title ? `<div style="font-size:15px;margin:4px 0">${escapeHtml(data.title)}</div>` : ''}
         <div class="original-url">${escapeHtml(data.original_url)}</div>
       </div>
@@ -212,12 +270,23 @@ async function loadAnalytics(code) {
   }
 }
 
+const icons = {
+  visit: `<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3H3v10h10V9"/><path d="M9 1h6v6"/><path d="M15 1L7 9"/></svg>`,
+  copy: `<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="5" width="9" height="9" rx="1"/><path d="M5 11H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v2"/></svg>`,
+  delete: `<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h12"/><path d="M5 4V2h6v2"/><path d="M6 7v5"/><path d="M10 7v5"/><path d="M3 4l1 10h8l1-10"/></svg>`,
+};
+
 // Helpers
 function escapeHtml(str) {
   if (!str) return '';
   const div = document.createElement('div');
   div.textContent = str;
   return div.innerHTML;
+}
+
+function escapeAttr(str) {
+  if (!str) return '';
+  return str.replace(/&/g, '&amp;').replace(/'/g, '&#39;').replace(/"/g, '&quot;');
 }
 
 function timeAgo(date) {

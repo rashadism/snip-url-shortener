@@ -111,6 +111,31 @@ func (s *Store) GetUserAnalytics(ctx context.Context, username string) ([]URLAna
 	return analytics, rows.Err()
 }
 
+func (s *Store) GetTopURLs(ctx context.Context, limit int) ([]URLAnalytics, error) {
+	ctx, span := tracer.Start(ctx, "store.GetTopURLs")
+	defer span.End()
+
+	rows, err := s.db.QueryContext(ctx,
+		`SELECT short_code, original_url, title, favicon_url, username, click_count, created_at
+		 FROM urls ORDER BY click_count DESC, created_at DESC LIMIT $1`,
+		limit,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var urls []URLAnalytics
+	for rows.Next() {
+		var a URLAnalytics
+		if err := rows.Scan(&a.ShortCode, &a.OriginalURL, &a.Title, &a.FaviconURL, &a.Username, &a.ClickCount, &a.CreatedAt); err != nil {
+			return nil, err
+		}
+		urls = append(urls, a)
+	}
+	return urls, rows.Err()
+}
+
 func (s *Store) GetClickCount(ctx context.Context, shortCode string) (int64, error) {
 	ctx, span := tracer.Start(ctx, "store.GetClickCount")
 	defer span.End()

@@ -34,6 +34,7 @@ func main() {
 	cache := NewCache(redisAddr)
 
 	mux := http.NewServeMux()
+	mux.HandleFunc("GET /api/analytics/top", handleGetTopURLs(store))
 	mux.HandleFunc("GET /api/analytics/user/", handleGetUserAnalytics(store))
 	mux.HandleFunc("GET /api/analytics/", handleGetAnalytics(store, cache))
 	mux.HandleFunc("GET /health", handleHealth(store))

@@ -46,10 +46,15 @@ func handleShorten(store *Store, cache *Cache) http.HandlerFunc {
 			return
 		}
 
+		// Auto-prepend https:// if no scheme provided
+		if !strings.HasPrefix(req.URL, "http://") && !strings.HasPrefix(req.URL, "https://") {
+			req.URL = "https://" + req.URL
+		}
+
 		// Validate URL
 		parsed, err := url.ParseRequestURI(req.URL)
-		if err != nil || (parsed.Scheme != "http" && parsed.Scheme != "https") {
-			writeJSON(w, http.StatusBadRequest, ErrorResponse{Error: "invalid URL (must start with http:// or https://)"})
+		if err != nil || parsed.Host == "" {
+			writeJSON(w, http.StatusBadRequest, ErrorResponse{Error: "invalid URL"})
 			return
 		}
 

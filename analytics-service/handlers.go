@@ -139,6 +139,35 @@ func handleGetUserAnalytics(store *Store) http.HandlerFunc {
 	}
 }
 
+func handleGetTopURLs(store *Store) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+		_, span := tracer.Start(ctx, "handler.GetTopURLs")
+		defer span.End()
+
+		urls, err := store.GetTopURLs(ctx, 50)
+		if err != nil {
+			log.Printf("ERROR: get top urls: %v", err)
+			writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "internal error"})
+			return
+		}
+		if urls == nil {
+			urls = []URLAnalytics{}
+		}
+
+		var totalClicks int64
+		for _, u := range urls {
+			totalClicks += u.ClickCount
+		}
+
+		writeJSON(w, http.StatusOK, map[string]interface{}{
+			"total_urls":   len(urls),
+			"total_clicks": totalClicks,
+			"urls":         urls,
+		})
+	}
+}
+
 func handleHealth(store *Store) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if err := store.db.Ping(); err != nil {
