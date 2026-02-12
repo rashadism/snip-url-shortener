@@ -1,0 +1,63 @@
+apiVersion: openchoreo.dev/v1alpha1
+kind: Component
+metadata:
+  name: api-service
+  namespace: default
+spec:
+  owner:
+    projectName: snip
+
+  componentType: deployment/service
+  autoDeploy: true
+
+  workflow:
+    name: docker
+
+    systemParameters:
+      repository:
+        url: "https://github.com/rashadism/snip"
+        revision:
+          branch: "main"
+        appPath: "/api-service"
+
+    parameters:
+      docker:
+        context: "/api-service"
+        filePath: "/api-service/Dockerfile"
+
+  parameters:
+    exposed: true
+    replicas: 1
+    port: 8080
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "256Mi"
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
+
+---
+apiVersion: openchoreo.dev/v1alpha1
+kind: ComponentWorkflowRun
+metadata:
+  name: api-service-build-01
+spec:
+  owner:
+    projectName: snip
+    componentName: api-service
+
+  workflow:
+    name: docker
+
+    systemParameters:
+      repository:
+        url: "https://github.com/rashadism/snip"
+        revision:
+          branch: "main"
+        appPath: "/api-service"
+
+    parameters:
+      docker:
+        context: "/api-service"
+        filePath: "/api-service/Dockerfile"

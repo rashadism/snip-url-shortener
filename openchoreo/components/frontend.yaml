@@ -1,0 +1,62 @@
+apiVersion: openchoreo.dev/v1alpha1
+kind: Component
+metadata:
+  name: frontend
+  namespace: default
+spec:
+  owner:
+    projectName: snip
+
+  componentType: deployment/web-application
+  autoDeploy: true
+
+  workflow:
+    name: docker
+
+    systemParameters:
+      repository:
+        url: "https://github.com/rashadism/snip"
+        revision:
+          branch: "main"
+        appPath: "/frontend"
+
+    parameters:
+      docker:
+        context: "/frontend"
+        filePath: "/frontend/Dockerfile"
+
+  parameters:
+    replicas: 1
+    port: 3000
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "256Mi"
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
+
+---
+apiVersion: openchoreo.dev/v1alpha1
+kind: ComponentWorkflowRun
+metadata:
+  name: frontend-build-01
+spec:
+  owner:
+    projectName: snip
+    componentName: frontend
+
+  workflow:
+    name: docker
+
+    systemParameters:
+      repository:
+        url: "https://github.com/rashadism/snip"
+        revision:
+          branch: "main"
+        appPath: "/frontend"
+
+    parameters:
+      docker:
+        context: "/frontend"
+        filePath: "/frontend/Dockerfile"

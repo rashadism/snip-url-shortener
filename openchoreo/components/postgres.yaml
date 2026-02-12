@@ -1,0 +1,62 @@
+apiVersion: openchoreo.dev/v1alpha1
+kind: Component
+metadata:
+  name: postgres
+  namespace: default
+spec:
+  owner:
+    projectName: snip
+
+  componentType: deployment/service
+  autoDeploy: true
+
+  workflow:
+    name: docker
+
+    systemParameters:
+      repository:
+        url: "https://github.com/rashadism/snip"
+        revision:
+          branch: "main"
+        appPath: "/db"
+
+    parameters:
+      docker:
+        context: "/db"
+        filePath: "/db/Dockerfile"
+
+  parameters:
+    replicas: 1
+    port: 5432
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "256Mi"
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
+
+---
+apiVersion: openchoreo.dev/v1alpha1
+kind: ComponentWorkflowRun
+metadata:
+  name: postgres-build-01
+spec:
+  owner:
+    projectName: snip
+    componentName: postgres
+
+  workflow:
+    name: docker
+
+    systemParameters:
+      repository:
+        url: "https://github.com/rashadism/snip"
+        revision:
+          branch: "main"
+        appPath: "/db"
+
+    parameters:
+      docker:
+        context: "/db"
+        filePath: "/db/Dockerfile"

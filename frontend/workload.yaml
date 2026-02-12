@@ -1,0 +1,22 @@
+apiVersion: openchoreo.dev/v1alpha1
+
+metadata:
+  name: frontend
+
+endpoints:
+  - name: webapp
+    port: 3000
+    type: HTTP
+
+configurations:
+  env:
+    - name: PORT
+      value: "3000"
+    - name: API_SERVICE_URL
+      value: "http://api-service:80"
+    - name: ANALYTICS_SERVICE_URL
+      value: "http://analytics-service:80"
+    - name: OTEL_ENABLED
+      value: "true"
+    - name: OTEL_EXPORTER_ENDPOINT
+      value: "http://opentelemetry-collector.openchoreo-observability-plane.svc.cluster.local:4318"
