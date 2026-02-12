@@ -5,7 +5,7 @@ metadata:
   namespace: default
 spec:
   owner:
-    projectName: snip
+    projectName: url-shortener
 
   componentType: deployment/service
   autoDeploy: true
@@ -30,7 +30,7 @@ metadata:
 spec:
   owner:
     componentName: redis
-    projectName: snip
+    projectName: url-shortener
   containers:
     main:
       image: redis:7-alpine

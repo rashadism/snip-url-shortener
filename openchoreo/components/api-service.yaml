@@ -5,7 +5,7 @@ metadata:
   namespace: default
 spec:
   owner:
-    projectName: snip
+    projectName: url-shortener
 
   componentType: deployment/service
   autoDeploy: true
@@ -44,7 +44,7 @@ metadata:
   name: api-service-build-01
 spec:
   owner:
-    projectName: snip
+    projectName: url-shortener
     componentName: api-service
 
   workflow:

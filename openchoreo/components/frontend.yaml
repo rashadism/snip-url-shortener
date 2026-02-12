@@ -5,7 +5,7 @@ metadata:
   namespace: default
 spec:
   owner:
-    projectName: snip
+    projectName: url-shortener
 
   componentType: deployment/web-application
   autoDeploy: true
@@ -43,7 +43,7 @@ metadata:
   name: frontend-build-01
 spec:
   owner:
-    projectName: snip
+    projectName: url-shortener
     componentName: frontend
 
   workflow:

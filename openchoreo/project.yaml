@@ -3,10 +3,10 @@ kind: Project
 metadata:
   annotations:
     openchoreo.dev/description: URL Shortener Demo — shorten URLs, track clicks
-    openchoreo.dev/display-name: Snip URL Shortener
+    openchoreo.dev/display-name: URL Shortener
   labels:
-    openchoreo.dev/name: snip
-  name: snip
+    openchoreo.dev/name: url-shortener
+  name: url-shortener
   namespace: default
 spec:
   deploymentPipelineRef: default
