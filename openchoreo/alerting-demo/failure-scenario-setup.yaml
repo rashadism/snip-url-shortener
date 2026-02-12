@@ -1,0 +1,16 @@
+---
+apiVersion: openchoreo.dev/v1alpha1
+kind: ReleaseBinding
+metadata:
+  name: api-service-development
+  namespace: default
+spec:
+  owner:
+    projectName: url-shortener
+    componentName: api-service
+  environment: development
+  traitOverrides:
+    api-service-redis-error-log-alert:
+      enabled: true
+      enableAiRootCauseAnalysis: true
+      notificationChannel: "webhook-notification-channel-development"
