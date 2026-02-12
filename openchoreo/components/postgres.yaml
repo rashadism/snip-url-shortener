@@ -15,7 +15,7 @@ spec:
 
     systemParameters:
       repository:
-        url: "https://github.com/rashadism/snip"
+        url: "https://github.com/rashadism/snip-url-shortener"
         revision:
           branch: "main"
         appPath: "/db"
@@ -51,7 +51,7 @@ spec:
 
     systemParameters:
       repository:
-        url: "https://github.com/rashadism/snip"
+        url: "https://github.com/rashadism/snip-url-shortener"
         revision:
           branch: "main"
         appPath: "/db"

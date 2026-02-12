@@ -43,4 +43,4 @@ Schema is in `db/init.sql`, baked into a custom postgres image (`db/Dockerfile`)
 
 ## OpenChoreo Deployment
 
-Manifests live in `openchoreo/`. Each source-based service has a `workload.yaml` descriptor alongside its Dockerfile defining endpoints and env vars (`configurations.env`). Service discovery in OpenChoreo uses `<component-name>:80` regardless of the container's actual port. Redis is the only image-based component; everything else builds from source via the `docker` workflow pointing at `github.com/rashadism/snip`.
+Manifests live in `openchoreo/`. Each source-based service has a `workload.yaml` descriptor alongside its Dockerfile defining endpoints and env vars (`configurations.env`). Service discovery in OpenChoreo uses `<component-name>:80` regardless of the container's actual port. Redis is the only image-based component; everything else builds from source via the `docker` workflow pointing at `github.com/rashadism/snip-url-shortener`.
