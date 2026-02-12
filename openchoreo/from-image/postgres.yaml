@@ -33,7 +33,7 @@ spec:
     projectName: url-shortener
   containers:
     main:
-      image: rashadxyz/snip-postgres:v0.1.0
+      image: rashadxyz/snip-postgres:v0.1.1
       env:
         - key: POSTGRES_USER
           value: "postgres"

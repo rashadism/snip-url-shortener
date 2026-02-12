@@ -34,7 +34,7 @@ spec:
     projectName: url-shortener
   containers:
     main:
-      image: rashadxyz/snip-api-service:v0.1.0
+      image: rashadxyz/snip-api-service:v0.1.1
       env:
         - key: PORT
           value: "8080"

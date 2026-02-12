@@ -51,13 +51,13 @@ manifests:
 	echo "Updated manifests: $$reg, v$$ver"
 
 # --- Bump patch version (only if source dirs changed since last bump) ---
-# Compares HEAD against the commit that last modified VERSION.
+# Compares HEAD against the ref stored in .version-ref.
 bump:
-	@last_bump=$$(git log -1 --format=%H -- VERSION 2>/dev/null || echo ""); \
-	if [ -z "$$last_bump" ]; then \
+	@if [ ! -f .version-ref ]; then \
 		changed="first build"; \
 	else \
-		changed=$$(git log --oneline "$$last_bump..HEAD" -- api-service/ analytics-service/ frontend/ db/); \
+		last_ref=$$(cat .version-ref); \
+		changed=$$(git diff --name-only "$$last_ref" -- api-service/ analytics-service/ frontend/ db/); \
 	fi; \
 	if [ -n "$$changed" ]; then \
 		current=$$(cat VERSION); \
@@ -66,6 +66,7 @@ bump:
 		patch=$$(echo $$current | cut -d. -f3); \
 		new_patch=$$((patch + 1)); \
 		echo "$$major.$$minor.$$new_patch" > VERSION; \
+		git rev-parse HEAD > .version-ref; \
 		echo "Bumped version: $$current -> $$major.$$minor.$$new_patch"; \
 	else \
 		echo "No code changes since last bump, skipping (v$$(cat VERSION))"; \
