@@ -42,4 +42,6 @@ spec:
         - key: ANALYTICS_SERVICE_URL
           value: "http://analytics-service:80"
         - key: OTEL_ENABLED
-          value: "false"
+          value: "true"
+        - key: OTEL_EXPORTER_ENDPOINT
+          value: "http://opentelemetry-collector.openchoreo-observability-plane.svc.cluster.local:4318"
