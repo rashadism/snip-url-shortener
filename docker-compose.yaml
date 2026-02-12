@@ -1,12 +1,13 @@
 services:
+  # Schema is baked into the image (db/Dockerfile) to avoid
+  # volume-mount complexity in k8s / OpenChoreo environments.
   postgres:
-    image: postgres:15-alpine
+    build: ./db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: urlshortener
     volumes:
-      - ./migrations/001_init.sql:/docker-entrypoint-initdb.d/001_init.sql
       - pgdata:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
