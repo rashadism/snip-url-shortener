@@ -1,0 +1,46 @@
+apiVersion: openchoreo.dev/v1alpha1
+kind: Component
+metadata:
+  name: api-service
+  namespace: default
+spec:
+  owner:
+    projectName: url-shortener
+
+  componentType: deployment/service
+  autoDeploy: true
+
+  parameters:
+    exposed: true
+    replicas: 1
+    port: 8080
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "256Mi"
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
+
+---
+apiVersion: openchoreo.dev/v1alpha1
+kind: Workload
+metadata:
+  name: api-service
+  namespace: default
+spec:
+  owner:
+    componentName: api-service
+    projectName: url-shortener
+  containers:
+    main:
+      image: rashadxyz/snip-api-service:v0.1.0
+      env:
+        - key: PORT
+          value: "8080"
+        - key: POSTGRES_DSN
+          value: "postgres://postgres:postgres@postgres:80/urlshortener?sslmode=disable"
+        - key: REDIS_ADDR
+          value: "redis:80"
+        - key: OTEL_ENABLED
+          value: "false"
