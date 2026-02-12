@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"strings"
@@ -41,7 +41,7 @@ func initTracer(serviceName string) func() {
 		otlptracehttp.WithInsecure(),
 	)
 	if err != nil {
-		log.Printf("WARN: failed to create trace exporter: %v", err)
+		slog.Warn("failed to create otel trace exporter", "error", err)
 		tracer = otel.Tracer(serviceName)
 		return func() {}
 	}
@@ -61,11 +61,11 @@ func initTracer(serviceName string) func() {
 	))
 
 	tracer = tp.Tracer(serviceName)
-	log.Printf("OpenTelemetry tracing initialized for %s (endpoint: %s)", serviceName, endpoint)
+	slog.Info("otel tracing initialized", "service", serviceName, "endpoint", endpoint)
 
 	return func() {
 		if err := tp.Shutdown(context.Background()); err != nil {
-			log.Printf("Error shutting down tracer: %v", err)
+			slog.Error("failed to shut down otel tracer", "error", err)
 		}
 	}
 }

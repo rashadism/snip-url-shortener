@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"log/slog"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -27,7 +28,7 @@ func NewCache(addr string) *Cache {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	if err := client.Ping(ctx).Err(); err != nil {
-		log.Printf("WARN: Redis unavailable at %s: %v (continuing without cache)", addr, err)
+		slog.Warn("redis unavailable, continuing without cache", "addr", addr, "error", err)
 		return nil
 	}
 	log.Printf("Redis connected at %s", addr)
@@ -48,6 +49,7 @@ func (c *Cache) GetURL(ctx context.Context, shortCode string) (string, error) {
 		return "", fmt.Errorf("cache miss")
 	}
 	if err != nil {
+		slog.Warn("failed to get URL from redis", "short_code", shortCode, "error", err)
 		return "", err
 	}
 	span.SetAttributes(attribute.Bool("cache.hit", true))
@@ -62,7 +64,7 @@ func (c *Cache) SetURL(ctx context.Context, shortCode, originalURL string) {
 	defer span.End()
 
 	if err := c.client.Set(ctx, "url:"+shortCode, originalURL, 1*time.Hour).Err(); err != nil {
-		log.Printf("WARN: cache set url:%s failed: %v", shortCode, err)
+		slog.Warn("failed to cache URL mapping in redis", "short_code", shortCode, "error", err)
 	}
 }
 
@@ -92,7 +94,7 @@ func (c *Cache) IncrClickCount(ctx context.Context, shortCode string) {
 	pipe.LTrim(ctx, "recent:"+shortCode, 0, 49)
 	pipe.Expire(ctx, "recent:"+shortCode, 5*time.Minute)
 	if _, err := pipe.Exec(ctx); err != nil {
-		log.Printf("WARN: cache incr click %s failed: %v", shortCode, err)
+		slog.Warn("failed to increment click count in redis", "short_code", shortCode, "error", err)
 	}
 }
 
@@ -105,6 +107,9 @@ func (c *Cache) GetClickCount(ctx context.Context, shortCode string) (int64, err
 
 	val, err := c.client.Get(ctx, "clicks:"+shortCode).Int64()
 	if err != nil {
+		if err != redis.Nil {
+			slog.Warn("failed to get click count from redis", "short_code", shortCode, "error", err)
+		}
 		return 0, err
 	}
 	return val, nil
@@ -117,7 +122,11 @@ func (c *Cache) GetRecentClicks(ctx context.Context, shortCode string) ([]string
 	ctx, span := tracer.Start(ctx, "cache.GetRecentClicks")
 	defer span.End()
 
-	return c.client.LRange(ctx, "recent:"+shortCode, 0, 49).Result()
+	vals, err := c.client.LRange(ctx, "recent:"+shortCode, 0, 49).Result()
+	if err != nil {
+		slog.Warn("failed to get recent clicks from redis", "short_code", shortCode, "error", err)
+	}
+	return vals, err
 }
 
 func (c *Cache) SetClickData(ctx context.Context, shortCode string, count int64, recentClicks []string) {
@@ -139,6 +148,6 @@ func (c *Cache) SetClickData(ctx context.Context, shortCode string, count int64,
 		pipe.Expire(ctx, "recent:"+shortCode, 5*time.Minute)
 	}
 	if _, err := pipe.Exec(ctx); err != nil {
-		log.Printf("WARN: cache set click data %s failed: %v", shortCode, err)
+		slog.Warn("failed to cache click data in redis", "short_code", shortCode, "error", err)
 	}
 }

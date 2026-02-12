@@ -2,7 +2,7 @@ package main
 
 import (
 	"io"
-	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"strings"
@@ -23,7 +23,7 @@ func proxyHandler(targetBase string, pathPrefix string) http.HandlerFunc {
 
 		proxyReq, err := http.NewRequestWithContext(ctx, r.Method, targetURL, r.Body)
 		if err != nil {
-			log.Printf("ERROR: proxy create request: %v", err)
+			slog.Error("failed to create proxy request", "target", targetURL, "error", err)
 			http.Error(w, "proxy error", http.StatusBadGateway)
 			return
 		}
@@ -37,7 +37,7 @@ func proxyHandler(targetBase string, pathPrefix string) http.HandlerFunc {
 
 		resp, err := httpClient.Do(proxyReq)
 		if err != nil {
-			log.Printf("ERROR: proxy to %s: %v", targetURL, err)
+			slog.Error("failed to proxy request", "target", targetURL, "error", err)
 			http.Error(w, "service unavailable", http.StatusBadGateway)
 			return
 		}

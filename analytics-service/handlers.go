@@ -3,7 +3,7 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
-	"log"
+	"log/slog"
 	"net/http"
 	"strings"
 	"time"
@@ -48,7 +48,7 @@ func handleGetAnalytics(store *Store, cache *Cache) http.HandlerFunc {
 				writeJSON(w, http.StatusNotFound, map[string]string{"error": "not found"})
 				return
 			}
-			log.Printf("ERROR: get analytics %s: %v", code, err)
+			slog.Error("failed to get URL analytics from postgres", "short_code", code, "error", err)
 			writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "internal error"})
 			return
 		}
@@ -72,7 +72,7 @@ func handleGetAnalytics(store *Store, cache *Cache) http.HandlerFunc {
 			// Fallback to postgres
 			recentClicks, err = store.GetRecentClicks(ctx, code, 50)
 			if err != nil {
-				log.Printf("WARN: get recent clicks %s: %v", code, err)
+				slog.Warn("failed to get recent clicks from postgres", "short_code", code, "error", err)
 				recentClicks = []ClickRecord{}
 			}
 			// Cache the result
@@ -116,7 +116,7 @@ func handleGetUserAnalytics(store *Store) http.HandlerFunc {
 
 		urls, err := store.GetUserAnalytics(ctx, username)
 		if err != nil {
-			log.Printf("ERROR: get user analytics %s: %v", username, err)
+			slog.Error("failed to get user analytics from postgres", "username", username, "error", err)
 			writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "internal error"})
 			return
 		}
@@ -147,7 +147,7 @@ func handleGetTopURLs(store *Store) http.HandlerFunc {
 
 		urls, err := store.GetTopURLs(ctx, 50)
 		if err != nil {
-			log.Printf("ERROR: get top urls: %v", err)
+			slog.Error("failed to get top URLs from postgres", "error", err)
 			writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "internal error"})
 			return
 		}

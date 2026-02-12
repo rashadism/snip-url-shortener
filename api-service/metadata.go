@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"io"
-	"log"
+	"log/slog"
 	"net/http"
 	"regexp"
 	"strings"
@@ -25,21 +25,21 @@ func fetchMetadata(ctx context.Context, shortCode, originalURL string, store *St
 	client := tracedHTTPClient()
 	req, err := http.NewRequestWithContext(ctx, "GET", originalURL, nil)
 	if err != nil {
-		log.Printf("metadata fetch: bad request for %s: %v", originalURL, err)
+		slog.Warn("failed to create metadata request", "url", originalURL, "error", err)
 		return
 	}
 	req.Header.Set("User-Agent", "snip-bot/1.0")
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Printf("metadata fetch: failed for %s: %v", originalURL, err)
+		slog.Warn("failed to fetch metadata", "url", originalURL, "error", err)
 		return
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(io.LimitReader(resp.Body, 1<<20)) // 1MB limit
 	if err != nil {
-		log.Printf("metadata fetch: read failed for %s: %v", originalURL, err)
+		slog.Warn("failed to read metadata response body", "url", originalURL, "error", err)
 		return
 	}
 
@@ -49,7 +49,7 @@ func fetchMetadata(ctx context.Context, shortCode, originalURL string, store *St
 
 	if title != "" || favicon != "" {
 		if err := store.UpdateMetadata(ctx, shortCode, title, favicon); err != nil {
-			log.Printf("metadata update failed for %s: %v", shortCode, err)
+			slog.Error("failed to save metadata to postgres", "short_code", shortCode, "error", err)
 		}
 	}
 }

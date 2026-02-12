@@ -6,7 +6,7 @@ import (
 	"database/sql"
 	"encoding/hex"
 	"encoding/json"
-	"log"
+	"log/slog"
 	"net/http"
 	"net/url"
 	"strings"
@@ -67,7 +67,7 @@ func handleShorten(store *Store, cache *Cache) http.HandlerFunc {
 			}
 			exists, err := store.ShortCodeExists(ctx, shortCode)
 			if err != nil {
-				log.Printf("ERROR: check slug: %v", err)
+				slog.Error("failed to check slug availability in postgres", "short_code", shortCode, "error", err)
 				writeJSON(w, http.StatusInternalServerError, ErrorResponse{Error: "internal error"})
 				return
 			}
@@ -83,7 +83,7 @@ func handleShorten(store *Store, cache *Cache) http.HandlerFunc {
 
 		u, err := store.InsertURL(ctx, shortCode, req.URL, req.Username)
 		if err != nil {
-			log.Printf("ERROR: insert url: %v", err)
+			slog.Error("failed to insert URL into postgres", "short_code", shortCode, "url", req.URL, "error", err)
 			writeJSON(w, http.StatusInternalServerError, ErrorResponse{Error: "failed to create short URL"})
 			return
 		}
@@ -124,7 +124,7 @@ func handleRedirect(store *Store, cache *Cache) http.HandlerFunc {
 					http.NotFound(w, r)
 					return
 				}
-				log.Printf("ERROR: get url %s: %v", code, err)
+				slog.Error("failed to get URL from postgres for redirect", "short_code", code, "error", err)
 				http.Error(w, "internal error", http.StatusInternalServerError)
 				return
 			}
@@ -136,7 +136,7 @@ func handleRedirect(store *Store, cache *Cache) http.HandlerFunc {
 		asyncCtx := context.WithoutCancel(ctx)
 		go func() {
 			if err := store.RecordClick(asyncCtx, code); err != nil {
-				log.Printf("WARN: record click %s: %v", code, err)
+				slog.Warn("failed to record click in postgres", "short_code", code, "error", err)
 			}
 			cache.IncrClickCount(asyncCtx, code)
 		}()
@@ -159,7 +159,7 @@ func handleListURLs(store *Store) http.HandlerFunc {
 
 		urls, err := store.ListURLs(ctx, username)
 		if err != nil {
-			log.Printf("ERROR: list urls: %v", err)
+			slog.Error("failed to list URLs from postgres", "username", username, "error", err)
 			writeJSON(w, http.StatusInternalServerError, ErrorResponse{Error: "internal error"})
 			return
 		}
@@ -188,7 +188,7 @@ func handleDeleteURL(store *Store, cache *Cache) http.HandlerFunc {
 				writeJSON(w, http.StatusNotFound, ErrorResponse{Error: "not found"})
 				return
 			}
-			log.Printf("ERROR: delete url %s: %v", code, err)
+			slog.Error("failed to delete URL from postgres", "short_code", code, "error", err)
 			writeJSON(w, http.StatusInternalServerError, ErrorResponse{Error: "internal error"})
 			return
 		}

@@ -23,20 +23,22 @@ CONTEXT_postgres := db
 
 .PHONY: build bump manifests $(addprefix build-,$(SERVICES)) $(addprefix push-,$(SERVICES))
 
-# --- Build, push, bump version, update manifests ---
-build: $(addprefix push-,$(SERVICES)) bump manifests
+# --- Bump, build, push, update manifests ---
+build: bump push manifests
 
-# --- Per-service build ---
+push: $(addprefix push-,$(SERVICES))
+
+# --- Per-service build (reads VERSION at execution time) ---
 define BUILD_RULE
 build-$(1):
-	docker build -t $(IMAGE_$(1)):v$(VERSION) -t $(IMAGE_$(1)):latest -f $(DOCKERFILE_$(1)) $(CONTEXT_$(1))
+	docker build -t $(IMAGE_$(1)):v`cat VERSION` -t $(IMAGE_$(1)):latest -f $(DOCKERFILE_$(1)) $(CONTEXT_$(1))
 endef
 $(foreach svc,$(SERVICES),$(eval $(call BUILD_RULE,$(svc))))
 
-# --- Per-service push ---
+# --- Per-service push (reads VERSION at execution time) ---
 define PUSH_RULE
 push-$(1): build-$(1)
-	docker push $(IMAGE_$(1)):v$(VERSION)
+	docker push $(IMAGE_$(1)):v`cat VERSION`
 	docker push $(IMAGE_$(1)):latest
 endef
 $(foreach svc,$(SERVICES),$(eval $(call PUSH_RULE,$(svc))))
