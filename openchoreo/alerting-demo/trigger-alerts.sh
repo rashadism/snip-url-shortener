@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # Generates traffic against the BFF to create short URLs and simulate visits.
-# Run before enabling the alert so traces are flowing when Redis dies.
-# Usage: bash trigger-alerts.sh &
+# Usage: bash trigger-alerts.sh [-v] &
+
+VERBOSE=false
+[[ "$1" == "-v" ]] && VERBOSE=true
 
 BFF="http://default.frontend-development.openchoreoapis.localhost:19080"
 
@@ -34,6 +36,11 @@ echo ""
 
 while true; do
   CODE=${CODES[$((RANDOM % ${#CODES[@]}))]}
-  curl -s -o /dev/null "$BFF/r/$CODE"
+  if $VERBOSE; then
+    STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$BFF/r/$CODE")
+    echo "GET /r/$CODE -> $STATUS"
+  else
+    curl -s -o /dev/null "$BFF/r/$CODE"
+  fi
   sleep 2
 done

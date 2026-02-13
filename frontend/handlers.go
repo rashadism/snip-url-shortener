@@ -43,6 +43,16 @@ func proxyHandler(targetBase string, pathPrefix string) http.HandlerFunc {
 		}
 		defer resp.Body.Close()
 
+		body, _ := io.ReadAll(resp.Body)
+
+		if resp.StatusCode >= 500 {
+			slog.Error("upstream error",
+				"target", targetURL,
+				"status", resp.StatusCode,
+				"body", strings.TrimSpace(string(body)),
+			)
+		}
+
 		// Copy response headers
 		for k, vv := range resp.Header {
 			for _, v := range vv {
@@ -50,7 +60,7 @@ func proxyHandler(targetBase string, pathPrefix string) http.HandlerFunc {
 			}
 		}
 		w.WriteHeader(resp.StatusCode)
-		io.Copy(w, resp.Body)
+		w.Write(body)
 	}
 }
 
