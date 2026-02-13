@@ -10,9 +10,6 @@
 Deploys five components (postgres, redis, api-service, analytics-service, frontend) using pre-built images:
 
 ```bash
-# Create the cache component type (Recreate strategy for Redis)
-kubectl apply -f openchoreo/cache-component-type.yaml
-
 kubectl apply -f openchoreo/project.yaml
 kubectl apply -f openchoreo/from-image/
 ```
