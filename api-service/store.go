@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log/slog"
 	"time"
 
 	_ "github.com/lib/pq"
@@ -26,22 +27,30 @@ type Store struct {
 	db *sql.DB
 }
 
-func NewStore(dsn string) (*Store, error) {
+func NewStore(dsn string) *Store {
 	db, err := sql.Open("postgres", dsn)
 	if err != nil {
-		return nil, fmt.Errorf("open db: %w", err)
+		// sql.Open only validates DSN format; this is a programming error
+		slog.Error("invalid postgres DSN", "error", err)
+		panic(err)
 	}
 	db.SetMaxOpenConns(25)
 	db.SetMaxIdleConns(10)
 	db.SetConnMaxLifetime(5 * time.Minute)
 
-	if err := db.Ping(); err != nil {
-		return nil, fmt.Errorf("ping db: %w", err)
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	if err := db.PingContext(ctx); err != nil {
+		slog.Warn("postgres connection failed, will retry on first query", "error", err)
 	}
-	return &Store{db: db}, nil
+	return &Store{db: db}
 }
 
+const queryTimeout = 4 * time.Second
+
 func (s *Store) InsertURL(ctx context.Context, shortCode, originalURL, username string) (*URL, error) {
+	ctx, cancel := context.WithTimeout(ctx, queryTimeout)
+	defer cancel()
 	ctx, span := tracer.Start(ctx, "store.InsertURL")
 	defer span.End()
 	span.SetAttributes(attribute.String("short_code", shortCode))
@@ -60,6 +69,8 @@ func (s *Store) InsertURL(ctx context.Context, shortCode, originalURL, username 
 }
 
 func (s *Store) GetURL(ctx context.Context, shortCode string) (*URL, error) {
+	ctx, cancel := context.WithTimeout(ctx, queryTimeout)
+	defer cancel()
 	ctx, span := tracer.Start(ctx, "store.GetURL")
 	defer span.End()
 	span.SetAttributes(attribute.String("short_code", shortCode))
@@ -77,6 +88,8 @@ func (s *Store) GetURL(ctx context.Context, shortCode string) (*URL, error) {
 }
 
 func (s *Store) ListURLs(ctx context.Context, username string) ([]URL, error) {
+	ctx, cancel := context.WithTimeout(ctx, queryTimeout)
+	defer cancel()
 	ctx, span := tracer.Start(ctx, "store.ListURLs")
 	defer span.End()
 	span.SetAttributes(attribute.String("username", username))
@@ -103,6 +116,8 @@ func (s *Store) ListURLs(ctx context.Context, username string) ([]URL, error) {
 }
 
 func (s *Store) DeleteURL(ctx context.Context, shortCode string) error {
+	ctx, cancel := context.WithTimeout(ctx, queryTimeout)
+	defer cancel()
 	ctx, span := tracer.Start(ctx, "store.DeleteURL")
 	defer span.End()
 	span.SetAttributes(attribute.String("short_code", shortCode))
@@ -119,6 +134,8 @@ func (s *Store) DeleteURL(ctx context.Context, shortCode string) error {
 }
 
 func (s *Store) RecordClick(ctx context.Context, shortCode string) error {
+	ctx, cancel := context.WithTimeout(ctx, queryTimeout)
+	defer cancel()
 	ctx, span := tracer.Start(ctx, "store.RecordClick")
 	defer span.End()
 	span.SetAttributes(attribute.String("short_code", shortCode))
@@ -141,6 +158,8 @@ func (s *Store) RecordClick(ctx context.Context, shortCode string) error {
 }
 
 func (s *Store) UpdateMetadata(ctx context.Context, shortCode, title, faviconURL string) error {
+	ctx, cancel := context.WithTimeout(ctx, queryTimeout)
+	defer cancel()
 	ctx, span := tracer.Start(ctx, "store.UpdateMetadata")
 	defer span.End()
 
@@ -152,6 +171,8 @@ func (s *Store) UpdateMetadata(ctx context.Context, shortCode, title, faviconURL
 }
 
 func (s *Store) ShortCodeExists(ctx context.Context, shortCode string) (bool, error) {
+	ctx, cancel := context.WithTimeout(ctx, queryTimeout)
+	defer cancel()
 	var exists bool
 	err := s.db.QueryRowContext(ctx, `SELECT EXISTS(SELECT 1 FROM urls WHERE short_code = $1)`, shortCode).Scan(&exists)
 	return exists, err

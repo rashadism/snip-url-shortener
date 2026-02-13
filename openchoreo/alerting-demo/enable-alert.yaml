@@ -1,0 +1,17 @@
+---
+# Enable the alert, AI RCA, and notification channel on the frontend
+apiVersion: openchoreo.dev/v1alpha1
+kind: ReleaseBinding
+metadata:
+  name: frontend-development
+  namespace: default
+spec:
+  owner:
+    projectName: url-shortener
+    componentName: frontend
+  environment: development
+  traitOverrides:
+    frontend-5xx-log-alert:
+      enabled: true
+      enableAiRootCauseAnalysis: true
+      notificationChannel: "webhook-notification-channel-development"

@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"database/sql"
-	"fmt"
+	"log/slog"
 	"time"
 
 	_ "github.com/lib/pq"
@@ -28,22 +28,29 @@ type Store struct {
 	db *sql.DB
 }
 
-func NewStore(dsn string) (*Store, error) {
+func NewStore(dsn string) *Store {
 	db, err := sql.Open("postgres", dsn)
 	if err != nil {
-		return nil, fmt.Errorf("open db: %w", err)
+		slog.Error("invalid postgres DSN", "error", err)
+		panic(err)
 	}
 	db.SetMaxOpenConns(15)
 	db.SetMaxIdleConns(5)
 	db.SetConnMaxLifetime(5 * time.Minute)
 
-	if err := db.Ping(); err != nil {
-		return nil, fmt.Errorf("ping db: %w", err)
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	if err := db.PingContext(ctx); err != nil {
+		slog.Warn("postgres connection failed, will retry on first query", "error", err)
 	}
-	return &Store{db: db}, nil
+	return &Store{db: db}
 }
 
+const queryTimeout = 4 * time.Second
+
 func (s *Store) GetURLAnalytics(ctx context.Context, shortCode string) (*URLAnalytics, error) {
+	ctx, cancel := context.WithTimeout(ctx, queryTimeout)
+	defer cancel()
 	ctx, span := tracer.Start(ctx, "store.GetURLAnalytics")
 	defer span.End()
 	span.SetAttributes(attribute.String("short_code", shortCode))
@@ -61,6 +68,8 @@ func (s *Store) GetURLAnalytics(ctx context.Context, shortCode string) (*URLAnal
 }
 
 func (s *Store) GetRecentClicks(ctx context.Context, shortCode string, limit int) ([]ClickRecord, error) {
+	ctx, cancel := context.WithTimeout(ctx, queryTimeout)
+	defer cancel()
 	ctx, span := tracer.Start(ctx, "store.GetRecentClicks")
 	defer span.End()
 	span.SetAttributes(attribute.String("short_code", shortCode))
@@ -86,6 +95,8 @@ func (s *Store) GetRecentClicks(ctx context.Context, shortCode string, limit int
 }
 
 func (s *Store) GetUserAnalytics(ctx context.Context, username string) ([]URLAnalytics, error) {
+	ctx, cancel := context.WithTimeout(ctx, queryTimeout)
+	defer cancel()
 	ctx, span := tracer.Start(ctx, "store.GetUserAnalytics")
 	defer span.End()
 	span.SetAttributes(attribute.String("username", username))
@@ -112,6 +123,8 @@ func (s *Store) GetUserAnalytics(ctx context.Context, username string) ([]URLAna
 }
 
 func (s *Store) GetTopURLs(ctx context.Context, limit int) ([]URLAnalytics, error) {
+	ctx, cancel := context.WithTimeout(ctx, queryTimeout)
+	defer cancel()
 	ctx, span := tracer.Start(ctx, "store.GetTopURLs")
 	defer span.End()
 
@@ -137,6 +150,8 @@ func (s *Store) GetTopURLs(ctx context.Context, limit int) ([]URLAnalytics, erro
 }
 
 func (s *Store) GetClickCount(ctx context.Context, shortCode string) (int64, error) {
+	ctx, cancel := context.WithTimeout(ctx, queryTimeout)
+	defer cancel()
 	ctx, span := tracer.Start(ctx, "store.GetClickCount")
 	defer span.End()
 

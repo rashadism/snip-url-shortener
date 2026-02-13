@@ -1,24 +1,24 @@
 apiVersion: openchoreo.dev/v1alpha1
 kind: Component
 metadata:
-  name: api-service
+  name: frontend
   namespace: default
 spec:
   owner:
     projectName: url-shortener
 
-  componentType: deployment/service
+  componentType: deployment/web-application
   autoDeploy: true
 
   traits:
     - name: observability-alert-rule
-      instanceName: api-service-redis-error-log-alert
+      instanceName: frontend-5xx-log-alert
       parameters:
-        description: "Alert when api-service logs indicate Redis connection errors"
+        description: "Alert when frontend logs indicate HTTP 500 responses"
         severity: "critical"
         source:
           type: "log"
-          query: "failed to get URL from redis"
+          query: "status=500"
         condition:
           window: "1m"
           interval: "1m"
@@ -26,9 +26,8 @@ spec:
           threshold: 5
 
   parameters:
-    exposed: true
     replicas: 1
-    port: 8080
+    port: 3000
     resources:
       requests:
         cpu: "100m"

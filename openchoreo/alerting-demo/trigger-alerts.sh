@@ -7,6 +7,12 @@ VERBOSE=false
 
 BFF="http://default.frontend-development.openchoreoapis.localhost:19080"
 
+echo "=== Waiting for API to be healthy ==="
+until curl -s "$BFF/api/urls?username=_ping" 2>/dev/null | grep -q '^\['; do
+  sleep 2
+done
+echo "API is healthy."
+
 echo "=== Creating short URLs ==="
 
 CODE1=$(curl -s -X POST "$BFF/api/shorten" \
@@ -30,11 +36,9 @@ echo ""
 echo "=== Traffic is flowing ==="
 echo "Visiting a random short URL every 2s... (kill with: kill $$)"
 echo ""
-echo "When ready, delete Redis to trigger the failure scenario:"
-echo "  kubectl delete component redis"
-echo ""
 
 while true; do
+  # Visit a real URL (cached in Redis — always succeeds)
   CODE=${CODES[$((RANDOM % ${#CODES[@]}))]}
   if $VERBOSE; then
     STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$BFF/r/$CODE")
@@ -42,5 +46,15 @@ while true; do
   else
     curl -s -o /dev/null "$BFF/r/$CODE"
   fi
-  sleep 2
+  sleep 1
+
+  # Visit a random URL (cache miss — hits Postgres, 404 when healthy, 500 when misconfigured)
+  RAND=$(head -c 4 /dev/urandom | od -An -tx1 | tr -d ' \n')
+  if $VERBOSE; then
+    STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$BFF/r/$RAND")
+    echo "GET /r/$RAND -> $STATUS"
+  else
+    curl -s -o /dev/null "$BFF/r/$RAND"
+  fi
+  sleep 1
 done

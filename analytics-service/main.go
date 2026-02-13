@@ -25,11 +25,7 @@ func main() {
 		redisAddr = "localhost:6379"
 	}
 
-	store, err := NewStore(dsn)
-	if err != nil {
-		log.Fatalf("Failed to connect to database: %v", err)
-	}
-	log.Println("Connected to PostgreSQL")
+	store := NewStore(dsn)
 
 	cache := NewCache(redisAddr)
 
