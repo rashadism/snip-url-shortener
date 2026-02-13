@@ -15,4 +15,4 @@ spec:
       main:
         env:
           - key: POSTGRES_DSN
-            value: "postgres://postgres:postgres@bad-host:5432/urlshortener?sslmode=disable"
+            value: "postgres://postgres:postgres@postgresss:5432/urlshortener?sslmode=disable"

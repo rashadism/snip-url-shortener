@@ -32,7 +32,7 @@ type ErrorResponse struct {
 func handleShorten(store *Store, cache *Cache) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
-		_, span := tracer.Start(ctx, "handler.Shorten")
+		ctx, span := tracer.Start(ctx, "handler.Shorten")
 		defer span.End()
 
 		var req ShortenRequest
@@ -104,7 +104,7 @@ func handleShorten(store *Store, cache *Cache) http.HandlerFunc {
 func handleRedirect(store *Store, cache *Cache) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
-		_, span := tracer.Start(ctx, "handler.Redirect")
+		ctx, span := tracer.Start(ctx, "handler.Redirect")
 		defer span.End()
 
 		code := strings.TrimPrefix(r.URL.Path, "/r/")
@@ -148,7 +148,7 @@ func handleRedirect(store *Store, cache *Cache) http.HandlerFunc {
 func handleListURLs(store *Store) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
-		_, span := tracer.Start(ctx, "handler.ListURLs")
+		ctx, span := tracer.Start(ctx, "handler.ListURLs")
 		defer span.End()
 
 		username := r.URL.Query().Get("username")
@@ -174,7 +174,7 @@ func handleListURLs(store *Store) http.HandlerFunc {
 func handleDeleteURL(store *Store, cache *Cache) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
-		_, span := tracer.Start(ctx, "handler.DeleteURL")
+		ctx, span := tracer.Start(ctx, "handler.DeleteURL")
 		defer span.End()
 
 		code := strings.TrimPrefix(r.URL.Path, "/api/urls/")

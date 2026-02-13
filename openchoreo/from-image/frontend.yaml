@@ -33,7 +33,7 @@ spec:
     projectName: url-shortener
   containers:
     main:
-      image: rashadxyz/snip-frontend:v0.2.3
+      image: rashadxyz/snip-frontend:v0.2.4
       env:
         - key: PORT
           value: "3000"

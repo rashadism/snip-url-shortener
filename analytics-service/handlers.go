@@ -31,7 +31,7 @@ type UserAnalyticsResponse struct {
 func handleGetAnalytics(store *Store, cache *Cache) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
-		_, span := tracer.Start(ctx, "handler.GetAnalytics")
+		ctx, span := tracer.Start(ctx, "handler.GetAnalytics")
 		defer span.End()
 
 		code := strings.TrimPrefix(r.URL.Path, "/api/analytics/")
@@ -104,7 +104,7 @@ func handleGetAnalytics(store *Store, cache *Cache) http.HandlerFunc {
 func handleGetUserAnalytics(store *Store) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
-		_, span := tracer.Start(ctx, "handler.GetUserAnalytics")
+		ctx, span := tracer.Start(ctx, "handler.GetUserAnalytics")
 		defer span.End()
 
 		username := strings.TrimPrefix(r.URL.Path, "/api/analytics/user/")
@@ -142,7 +142,7 @@ func handleGetUserAnalytics(store *Store) http.HandlerFunc {
 func handleGetTopURLs(store *Store) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
-		_, span := tracer.Start(ctx, "handler.GetTopURLs")
+		ctx, span := tracer.Start(ctx, "handler.GetTopURLs")
 		defer span.End()
 
 		urls, err := store.GetTopURLs(ctx, 50)

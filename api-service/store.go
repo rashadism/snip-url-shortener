@@ -162,6 +162,7 @@ func (s *Store) UpdateMetadata(ctx context.Context, shortCode, title, faviconURL
 	defer cancel()
 	ctx, span := tracer.Start(ctx, "store.UpdateMetadata")
 	defer span.End()
+	span.SetAttributes(attribute.String("short_code", shortCode))
 
 	_, err := s.db.ExecContext(ctx,
 		`UPDATE urls SET title = $1, favicon_url = $2, updated_at = NOW() WHERE short_code = $3`,
@@ -173,6 +174,9 @@ func (s *Store) UpdateMetadata(ctx context.Context, shortCode, title, faviconURL
 func (s *Store) ShortCodeExists(ctx context.Context, shortCode string) (bool, error) {
 	ctx, cancel := context.WithTimeout(ctx, queryTimeout)
 	defer cancel()
+	ctx, span := tracer.Start(ctx, "store.ShortCodeExists")
+	defer span.End()
+	span.SetAttributes(attribute.String("short_code", shortCode))
 	var exists bool
 	err := s.db.QueryRowContext(ctx, `SELECT EXISTS(SELECT 1 FROM urls WHERE short_code = $1)`, shortCode).Scan(&exists)
 	return exists, err

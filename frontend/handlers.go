@@ -13,7 +13,7 @@ var httpClient = newProxyClient()
 func proxyHandler(targetBase string, pathPrefix string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
-		_, span := tracer.Start(ctx, "proxy."+pathPrefix)
+		ctx, span := tracer.Start(ctx, "proxy."+pathPrefix)
 		defer span.End()
 
 		targetURL := targetBase + r.URL.Path
