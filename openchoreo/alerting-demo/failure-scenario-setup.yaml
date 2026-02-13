@@ -10,6 +10,9 @@ spec:
     projectName: url-shortener
     componentName: api-service
   environment: development
-  componentTypeEnvOverrides:
-    configurations.env:
-      POSTGRES_DSN: "postgres://postgres:postgres@bad-host:5432/urlshortener?sslmode=disable"
+  workloadOverrides:
+    containers:
+      main:
+        env:
+          - key: POSTGRES_DSN
+            value: "postgres://postgres:postgres@bad-host:5432/urlshortener?sslmode=disable"
