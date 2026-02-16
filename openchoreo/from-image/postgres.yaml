@@ -31,6 +31,10 @@ spec:
   owner:
     componentName: postgres
     projectName: url-shortener
+  endpoints:
+    tcp:
+      type: TCP
+      port: 5432
   containers:
     main:
       image: rashadxyz/snip-postgres:v0.2.4

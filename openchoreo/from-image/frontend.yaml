@@ -31,6 +31,10 @@ spec:
   owner:
     componentName: frontend
     projectName: url-shortener
+  endpoints:
+    http:
+      type: HTTP
+      port: 3000
   containers:
     main:
       image: rashadxyz/snip-frontend:v0.2.4
@@ -38,9 +42,9 @@ spec:
         - key: PORT
           value: "3000"
         - key: API_SERVICE_URL
-          value: "http://api-service:80"
+          value: "http://api-service:8080"
         - key: ANALYTICS_SERVICE_URL
-          value: "http://analytics-service:80"
+          value: "http://analytics-service:8081"
         - key: OTEL_ENABLED
           value: "true"
         - key: OTEL_EXPORTER_ENDPOINT

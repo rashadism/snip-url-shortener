@@ -5,7 +5,7 @@
 VERBOSE=false
 [[ "$1" == "-v" ]] && VERBOSE=true
 
-BFF="http://default.frontend-development.openchoreoapis.localhost:19080"
+BFF="http://frontend-development-default.openchoreoapis.localhost:19080"
 
 echo "=== Waiting for API to be healthy ==="
 until curl -s "$BFF/api/urls?username=_ping" 2>/dev/null | grep -q '^\['; do

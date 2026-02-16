@@ -31,6 +31,10 @@ spec:
   owner:
     componentName: redis
     projectName: url-shortener
+  endpoints:
+    tcp:
+      type: TCP
+      port: 6379
   containers:
     main:
       image: redis:7-alpine

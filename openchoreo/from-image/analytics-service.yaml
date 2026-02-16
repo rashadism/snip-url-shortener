@@ -32,6 +32,10 @@ spec:
   owner:
     componentName: analytics-service
     projectName: url-shortener
+  endpoints:
+    http:
+      type: HTTP
+      port: 8081
   containers:
     main:
       image: rashadxyz/snip-analytics-service:v0.2.4
@@ -39,9 +43,9 @@ spec:
         - key: PORT
           value: "8081"
         - key: POSTGRES_DSN
-          value: "postgres://postgres:postgres@postgres:80/urlshortener?sslmode=disable"
+          value: "postgres://postgres:postgres@postgres:5432/urlshortener?sslmode=disable"
         - key: REDIS_ADDR
-          value: "redis:80"
+          value: "redis:6379"
         - key: OTEL_ENABLED
           value: "true"
         - key: OTEL_EXPORTER_ENDPOINT
