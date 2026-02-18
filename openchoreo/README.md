@@ -68,6 +68,13 @@ Confirm load is being generated at http://frontend-development-default.openchore
 kubectl apply -f openchoreo/alerting-demo/failure-scenario-setup.yaml
 ```
 
+After the alert fires, fix the misconfigured DSN before moving to scenario 2:
+
+```bash
+kubectl patch releasebinding api-service-development --type=json \
+  -p '[{"op":"remove","path":"/spec/workloadOverrides"}]'
+```
+
 **2. Metric-based alert (high memory under load)**
 
 The same `failure-scenario-setup.yaml` also lowers the api-service memory limit to 55Mi. Under idle load the service uses ~7 MB (~13%), but under heavy traffic it climbs to ~40 MB (~72%), well above the 35% threshold. Use `generate-load.sh` to drive the traffic:
