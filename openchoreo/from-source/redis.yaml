@@ -17,7 +17,7 @@ spec:
       repository:
         url: "https://github.com/rashadism/snip-url-shortener"
         revision:
-          branch: "v16"
+          branch: "main"
         appPath: "/redis"
 
     parameters:
