@@ -10,6 +10,21 @@ spec:
   componentType: deployment/service
   autoDeploy: true
 
+  workflow:
+    name: docker
+
+    systemParameters:
+      repository:
+        url: "https://github.com/rashadism/snip-url-shortener"
+        revision:
+          branch: "v16"
+        appPath: "/redis"
+
+    parameters:
+      docker:
+        context: "/redis"
+        filePath: "/redis/Dockerfile"
+
   parameters:
     replicas: 1
     port: 6379
@@ -23,14 +38,25 @@ spec:
 
 ---
 apiVersion: openchoreo.dev/v1alpha1
-kind: Workload
+kind: ComponentWorkflowRun
 metadata:
-  name: redis
-  namespace: default
+  name: redis-build-01
 spec:
   owner:
-    componentName: redis
     projectName: url-shortener
-  containers:
-    main:
-      image: redis:7-alpine
+    componentName: redis
+
+  workflow:
+    name: docker
+
+    systemParameters:
+      repository:
+        url: "https://github.com/rashadism/snip-url-shortener"
+        revision:
+          branch: "main"
+        appPath: "/redis"
+
+    parameters:
+      docker:
+        context: "/redis"
+        filePath: "/redis/Dockerfile"

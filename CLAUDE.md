@@ -15,7 +15,20 @@ docker compose up --build api-service
 # API service at http://localhost:9701, Analytics at http://localhost:9702
 ```
 
-No Makefile, tests, linter, or CI pipeline exists yet. Each service is a standalone Go module under a `go.work` workspace (Go 1.23).
+No tests, linter, or CI pipeline exists yet. Each service is a standalone Go module under a `go.work` workspace (Go 1.23).
+
+### Build & Push Images
+
+```bash
+# Set your DockerHub username, then log in
+echo "your-username" > REGISTRY
+docker login
+
+# Bump patch version, build & push all images, update from-image manifests
+make build
+```
+
+Version is tracked in `VERSION` (currently `0.2.4`). `make build` auto-bumps the patch number if source dirs changed since the last bump (tracked via `.version-ref`).
 
 ## Architecture
 
