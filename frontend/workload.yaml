@@ -13,9 +13,9 @@ configurations:
     - name: PORT
       value: "3000"
     - name: API_SERVICE_URL
-      value: "http://api-service:80"
+      value: "http://api-service:8080"
     - name: ANALYTICS_SERVICE_URL
-      value: "http://analytics-service:80"
+      value: "http://analytics-service:8081"
     - name: OTEL_ENABLED
       value: "true"
     - name: OTEL_EXPORTER_ENDPOINT

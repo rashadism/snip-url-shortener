@@ -14,7 +14,12 @@ kubectl apply -f openchoreo/project.yaml
 kubectl apply -f openchoreo/from-image/
 ```
 
-Alternatively, you can [build from source](from-source/README.md).
+Alternatively, you can build from source:
+
+```bash
+kubectl apply -f openchoreo/project.yaml
+kubectl apply -f openchoreo/from-source/
+```
 
 ## Alerting Demo
 
