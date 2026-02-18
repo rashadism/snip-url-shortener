@@ -38,7 +38,7 @@ spec:
       port: 8080
   containers:
     main:
-      image: rashadxyz/snip-api-service:v0.2.4
+      image: rashadxyz/snip-api-service:v0.2.5
       env:
         - key: PORT
           value: "8080"

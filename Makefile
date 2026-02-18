@@ -21,25 +21,21 @@ CONTEXT_analytics := analytics-service
 CONTEXT_frontend := frontend
 CONTEXT_postgres := db
 
-.PHONY: build bump manifests $(addprefix build-,$(SERVICES)) $(addprefix push-,$(SERVICES))
+PLATFORMS := linux/amd64,linux/arm64
 
-# --- Bump, build, push, update manifests ---
+.PHONY: build bump manifests $(addprefix push-,$(SERVICES))
+
+# --- Bump, build+push (multi-arch), update manifests ---
 build: bump push manifests
 
 push: $(addprefix push-,$(SERVICES))
 
-# --- Per-service build (reads VERSION at execution time) ---
-define BUILD_RULE
-build-$(1):
-	docker build -t $(IMAGE_$(1)):v`cat VERSION` -t $(IMAGE_$(1)):latest -f $(DOCKERFILE_$(1)) $(CONTEXT_$(1))
-endef
-$(foreach svc,$(SERVICES),$(eval $(call BUILD_RULE,$(svc))))
-
-# --- Per-service push (reads VERSION at execution time) ---
+# --- Per-service multi-arch build & push ---
 define PUSH_RULE
-push-$(1): build-$(1)
-	docker push $(IMAGE_$(1)):v`cat VERSION`
-	docker push $(IMAGE_$(1)):latest
+push-$(1):
+	docker buildx build --platform $(PLATFORMS) \
+		-t $(IMAGE_$(1)):v`cat VERSION` -t $(IMAGE_$(1)):latest \
+		-f $(DOCKERFILE_$(1)) $(CONTEXT_$(1)) --push
 endef
 $(foreach svc,$(SERVICES),$(eval $(call PUSH_RULE,$(svc))))
 

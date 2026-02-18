@@ -37,7 +37,7 @@ spec:
       port: 5432
   containers:
     main:
-      image: rashadxyz/snip-postgres:v0.2.4
+      image: rashadxyz/snip-postgres:v0.2.5
       env:
         - key: POSTGRES_USER
           value: "postgres"

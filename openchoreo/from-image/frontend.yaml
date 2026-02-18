@@ -37,7 +37,7 @@ spec:
       port: 3000
   containers:
     main:
-      image: rashadxyz/snip-frontend:v0.2.4
+      image: rashadxyz/snip-frontend:v0.2.5
       env:
         - key: PORT
           value: "3000"
