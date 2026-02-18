@@ -17,7 +17,7 @@ spec:
       repository:
         url: "https://github.com/rashadism/snip-url-shortener"
         revision:
-          branch: "main"
+          branch: "v16"
         appPath: "/frontend"
 
     parameters:

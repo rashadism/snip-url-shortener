@@ -1,0 +1,38 @@
+apiVersion: openchoreo.dev/v1alpha1
+kind: Component
+metadata:
+  name: api-service
+  namespace: default
+spec:
+  owner:
+    projectName: url-shortener
+
+  componentType: deployment/service
+  autoDeploy: true
+
+  traits:
+    - name: observability-alert-rule
+      instanceName: api-service-high-memory-alert
+      parameters:
+        description: "Alert when api-service memory usage exceeds 35% of its limit"
+        severity: "critical"
+        source:
+          type: "metric"
+          metric: "memory_usage"
+        condition:
+          window: "1m"
+          interval: "1m"
+          operator: "gt"
+          threshold: 60
+
+  parameters:
+    exposed: true
+    replicas: 1
+    port: 8080
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "256Mi"
+      limits:
+        cpu: "500m"
+        memory: "512Mi"

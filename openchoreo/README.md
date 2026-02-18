@@ -16,43 +16,63 @@ kubectl apply -f openchoreo/from-image/
 
 Alternatively, you can [build from source](from-source/README.md).
 
-## Alerting
+## Alerting Demo
 
-Log-based alert setup for the api-service component.
+Two alert rules have been added to demonstrate OpenChoreo's observability alerting:
 
-- `alerting-demo/alert-notification-channels.yaml` — Dummy webhook notification channel and secret
-- `alerting-demo/frontend-component.yaml` — Frontend component with a log-based alert trait
-- `alerting-demo/enable-alert.yaml` — ReleaseBinding that enables the alert, AI RCA, and notification channel
-- `alerting-demo/failure-scenario-setup.yaml` — ReleaseBinding that misconfigures the api-service Postgres DSN
-- `alerting-demo/trigger-alerts.sh` — Script that creates short URLs and simulates visits every 2s
+1. **Log-based alert** on the frontend — triggers when `status=500` appears more than 5 times within 1 minute
+2. **Metric-based alert** on the api-service — triggers when `memory_usage` exceeds 35% of its limit
 
-### Failure Scenario
-
-The `failure-scenario-setup.yaml` misconfigures the api-service's `POSTGRES_DSN` to point to a non-existent host. The api-service starts but every DB query fails, returning 500s. The frontend logs `"upstream error"` on each proxied request, breaching the alert threshold. The RCA agent then traces from the frontend alert → api-service 500s → Postgres connection errors → misconfigured DSN.
-
-### Apply
+### Setup
 
 ```bash
 # Set up the webhook notification channel and its secret
 kubectl apply -f openchoreo/alerting-demo/alert-notification-channels.yaml
 
-# Deploy the frontend component with the log-based alert trait
+# Update the frontend component to have the log-based alert trait
 kubectl apply -f openchoreo/alerting-demo/frontend-component.yaml
 
-# Enable the alert, AI RCA, and notification channel
-kubectl apply -f openchoreo/alerting-demo/enable-alert.yaml
+# Update the api-service component to have the metric-based memory alert trait
+kubectl apply -f openchoreo/alerting-demo/api-service-component.yaml
 
+# Enable the frontend log alert, AI RCA, and notification channel
+kubectl apply -f openchoreo/alerting-demo/enable-alert.yaml
+```
+
+### Failure Scenarios
+
+There are two failure scenarios, applied separately:
+
+**1. Log-based alert (misconfigured Postgres DSN)**
+
+The `failure-scenario-setup.yaml` misconfigures the api-service's `POSTGRES_DSN` to point to a non-existent host. The api-service starts but every DB query fails, returning 500s. The frontend logs `"upstream error"` on each proxied request, breaching the alert threshold. The RCA agent then traces from the frontend alert → api-service 500s → Postgres connection errors → misconfigured DSN.
+
+```bash
 # Start generating traffic (creates 3 short URLs, then visits them every 2s)
 chmod +x openchoreo/alerting-demo/trigger-alerts.sh
 bash openchoreo/alerting-demo/trigger-alerts.sh
+
+# For a remote cluster, pass the BFF URL as an argument
+bash openchoreo/alerting-demo/trigger-alerts.sh http://<your-bff-host>
 ```
 
-Confirm load is being generated at http://default.frontend-development.openchoreoapis.localhost:19080/
-
-Apply the failure scenario (misconfigures Postgres DSN):
+Confirm load is being generated at http://frontend-development-default.openchoreoapis.localhost:19080/
 
 ```bash
+# Apply the failure scenario (misconfigures Postgres DSN + lowers api-service memory to 55Mi)
 kubectl apply -f openchoreo/alerting-demo/failure-scenario-setup.yaml
+```
+
+**2. Metric-based alert (high memory under load)**
+
+The same `failure-scenario-setup.yaml` also lowers the api-service memory limit to 55Mi. Under idle load the service uses ~7 MB (~13%), but under heavy traffic it climbs to ~40 MB (~72%), well above the 35% threshold. Use `generate-load.sh` to drive the traffic:
+
+```bash
+chmod +x openchoreo/alerting-demo/generate-load.sh
+bash openchoreo/alerting-demo/generate-load.sh
+
+# For a remote cluster, pass the BFF URL after the concurrency and flags
+bash openchoreo/alerting-demo/generate-load.sh 50 http://<your-bff-host>
 ```
 
 ## Cleanup

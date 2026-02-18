@@ -1,11 +1,20 @@
 #!/usr/bin/env bash
 # Generates traffic against the BFF to create short URLs and simulate visits.
-# Usage: bash trigger-alerts.sh [-v] &
+# Usage:
+#   bash trigger-alerts.sh                              # default BFF
+#   bash trigger-alerts.sh -v                           # verbose
+#   bash trigger-alerts.sh http://localhost:9700         # custom BFF URL
+#   bash trigger-alerts.sh -v http://localhost:9700      # both
 
 VERBOSE=false
-[[ "$1" == "-v" ]] && VERBOSE=true
-
 BFF="http://frontend-development-default.openchoreoapis.localhost:19080"
+
+for arg in "$@"; do
+  case "$arg" in
+    -v) VERBOSE=true ;;
+    http://*|https://*) BFF="$arg" ;;
+  esac
+done
 
 echo "=== Waiting for API to be healthy ==="
 until curl -s "$BFF/api/urls?username=_ping" 2>/dev/null | grep -q '^\['; do
