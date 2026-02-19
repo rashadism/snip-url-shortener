@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-- An OpenChoreo cluster with the control plane and build plane installed
+- An OpenChoreo cluster with the control plane and observability plane installed
 - `kubectl` access to the cluster
 
 ## Deploy
