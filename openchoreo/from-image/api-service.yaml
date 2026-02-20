@@ -7,7 +7,9 @@ spec:
   owner:
     projectName: url-shortener
 
-  componentType: deployment/service
+  componentType:
+    kind: ComponentType
+    name: deployment/service
   autoDeploy: true
 
   parameters:
@@ -36,17 +38,16 @@ spec:
     http:
       type: HTTP
       port: 8080
-  containers:
-    main:
-      image: rashadxyz/snip-api-service:v0.2.5
-      env:
-        - key: PORT
-          value: "8080"
-        - key: POSTGRES_DSN
-          value: "postgres://postgres:postgres@postgres:5432/urlshortener?sslmode=disable"
-        - key: REDIS_ADDR
-          value: "redis:6379"
-        - key: OTEL_ENABLED
-          value: "true"
-        - key: OTEL_EXPORTER_ENDPOINT
-          value: "http://opentelemetry-collector.openchoreo-observability-plane.svc.cluster.local:4318"
+  container:
+    image: rashadxyz/snip-api-service:v0.2.5
+    env:
+      - key: PORT
+        value: "8080"
+      - key: POSTGRES_DSN
+        value: "postgres://postgres:postgres@postgres:5432/urlshortener?sslmode=disable"
+      - key: REDIS_ADDR
+        value: "redis:6379"
+      - key: OTEL_ENABLED
+        value: "true"
+      - key: OTEL_EXPORTER_ENDPOINT
+        value: "http://opentelemetry-collector.openchoreo-observability-plane.svc.cluster.local:4318"

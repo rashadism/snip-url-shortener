@@ -7,7 +7,9 @@ spec:
   owner:
     projectName: url-shortener
 
-  componentType: deployment/web-application
+  componentType:
+    kind: ComponentType
+    name: deployment/web-application
   autoDeploy: true
 
   parameters:
@@ -35,17 +37,16 @@ spec:
     http:
       type: HTTP
       port: 3000
-  containers:
-    main:
-      image: rashadxyz/snip-frontend:v0.2.5
-      env:
-        - key: PORT
-          value: "3000"
-        - key: API_SERVICE_URL
-          value: "http://api-service:8080"
-        - key: ANALYTICS_SERVICE_URL
-          value: "http://analytics-service:8081"
-        - key: OTEL_ENABLED
-          value: "true"
-        - key: OTEL_EXPORTER_ENDPOINT
-          value: "http://opentelemetry-collector.openchoreo-observability-plane.svc.cluster.local:4318"
+  container:
+    image: rashadxyz/snip-frontend:v0.2.5
+    env:
+      - key: PORT
+        value: "3000"
+      - key: API_SERVICE_URL
+        value: "http://api-service:8080"
+      - key: ANALYTICS_SERVICE_URL
+        value: "http://analytics-service:8081"
+      - key: OTEL_ENABLED
+        value: "true"
+      - key: OTEL_EXPORTER_ENDPOINT
+        value: "http://opentelemetry-collector.openchoreo-observability-plane.svc.cluster.local:4318"

@@ -7,7 +7,9 @@ spec:
   owner:
     projectName: url-shortener
 
-  componentType: deployment/service
+  componentType:
+    kind: ComponentType
+    name: deployment/service
   autoDeploy: true
 
   parameters:
@@ -35,6 +37,5 @@ spec:
     tcp:
       type: TCP
       port: 6379
-  containers:
-    main:
-      image: redis:7-alpine
+  container:
+    image: redis:7-alpine
