@@ -7,6 +7,7 @@ endpoints:
   - name: webapp
     port: 3000
     type: HTTP
+    visibility: [external]
 
 connections:
   - name: api-service
