@@ -9,7 +9,7 @@ endpoints:
     type: HTTP
 
 connections:
-  api-service:
+  - name: api-service
     type: api
     params:
       projectName: url-shortener
@@ -19,7 +19,7 @@ connections:
       env:
         - name: API_SERVICE_URL
           value: "http://{{ .host }}:{{ .port }}"
-  analytics-service:
+  - name: analytics-service
     type: api
     params:
       projectName: url-shortener

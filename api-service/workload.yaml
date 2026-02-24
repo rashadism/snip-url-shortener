@@ -9,7 +9,7 @@ endpoints:
     type: HTTP
 
 connections:
-  postgres:
+  - name: postgres
     type: api
     params:
       projectName: url-shortener
@@ -19,7 +19,7 @@ connections:
       env:
         - name: POSTGRES_DSN
           value: "postgres://postgres:postgres@{{ .host }}:{{ .port }}/urlshortener?sslmode=disable"
-  redis:
+  - name: redis
     type: api
     params:
       projectName: url-shortener
