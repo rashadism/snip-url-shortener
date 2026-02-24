@@ -37,6 +37,28 @@ spec:
     http:
       type: HTTP
       port: 3000
+      visibility: [external]
+  connections:
+    api-service:
+      type: api
+      params:
+        projectName: url-shortener
+        componentName: api-service
+        endpoint: http
+      inject:
+        env:
+          - name: API_SERVICE_URL
+            value: "http://{{ .host }}:{{ .port }}"
+    analytics-service:
+      type: api
+      params:
+        projectName: url-shortener
+        componentName: analytics-service
+        endpoint: http
+      inject:
+        env:
+          - name: ANALYTICS_SERVICE_URL
+            value: "http://{{ .host }}:{{ .port }}"
   container:
     image: rashadxyz/snip-frontend:v0.2.5
     env:
