@@ -11,11 +11,10 @@ spec:
     componentName: api-service
   environment: development
   workloadOverrides:
-    containers:
-      main:
-        env:
-          - key: POSTGRES_DSN
-            value: "postgres://postgres:postgres@postgresss:5432/urlshortener?sslmode=disable"
+    container:
+      env:
+        - key: POSTGRES_DSN
+          value: "postgres://postgres:postgres@postgresss:5432/urlshortener?sslmode=disable"
   componentTypeEnvOverrides:
     resources:
       requests:

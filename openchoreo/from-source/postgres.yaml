@@ -7,7 +7,9 @@ spec:
   owner:
     projectName: url-shortener
 
-  componentType: deployment/service
+  componentType:
+    kind: ComponentType
+    name: deployment/service
   autoDeploy: true
 
   workflow:

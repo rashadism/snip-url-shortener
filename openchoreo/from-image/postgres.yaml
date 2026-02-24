@@ -7,7 +7,9 @@ spec:
   owner:
     projectName: url-shortener
 
-  componentType: deployment/service
+  componentType:
+    kind: ComponentType
+    name: deployment/service
   autoDeploy: true
 
   parameters:
@@ -35,13 +37,12 @@ spec:
     tcp:
       type: TCP
       port: 5432
-  containers:
-    main:
-      image: rashadxyz/snip-postgres:v0.2.5
-      env:
-        - key: POSTGRES_USER
-          value: "postgres"
-        - key: POSTGRES_PASSWORD
-          value: "postgres"
-        - key: POSTGRES_DB
-          value: "urlshortener"
+  container:
+    image: rashadxyz/snip-postgres:v0.2.5
+    env:
+      - key: POSTGRES_USER
+        value: "postgres"
+      - key: POSTGRES_PASSWORD
+        value: "postgres"
+      - key: POSTGRES_DB
+        value: "urlshortener"

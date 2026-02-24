@@ -8,6 +8,28 @@ endpoints:
     port: 8080
     type: HTTP
 
+connections:
+  postgres:
+    type: api
+    params:
+      projectName: url-shortener
+      componentName: postgres
+      endpoint: postgres
+    inject:
+      env:
+        - name: POSTGRES_DSN
+          value: "postgres://postgres:postgres@{{ .host }}:{{ .port }}/urlshortener?sslmode=disable"
+  redis:
+    type: api
+    params:
+      projectName: url-shortener
+      componentName: redis
+      endpoint: redis
+    inject:
+      env:
+        - name: REDIS_ADDR
+          value: "{{ .host }}:{{ .port }}"
+
 configurations:
   env:
     - name: PORT
