@@ -23,10 +23,7 @@ kubectl apply -f openchoreo/from-source/
 
 ## Alerting Demo
 
-Two alert rules have been added to demonstrate OpenChoreo's observability alerting:
-
-1. **Log-based alert** on the frontend — triggers when `status=500` appears more than 5 times within 1 minute
-2. **Metric-based alert** on the api-service — triggers when `memory_usage` exceeds 35% of its limit
+A log-based alert rule on the frontend triggers when `status=500` appears more than 5 times within 1 minute.
 
 ### Setup
 
@@ -34,57 +31,56 @@ Two alert rules have been added to demonstrate OpenChoreo's observability alerti
 # Set up the webhook notification channel and its secret
 kubectl apply -f openchoreo/alerting-demo/alert-notification-channels.yaml
 
-# Update the frontend component to have the log-based alert trait
-kubectl apply -f openchoreo/alerting-demo/frontend-component.yaml
+# Patch the frontend component to add the log-based alert trait
+kubectl patch component frontend --type='json' -p='[
+  {"op": "add", "path": "/spec/traits", "value": [
+    {
+      "name": "observability-alert-rule",
+      "instanceName": "frontend-5xx-log-alert",
+      "parameters": {
+        "description": "Alert when frontend logs indicate HTTP 500 responses",
+        "severity": "critical",
+        "source": {
+          "type": "log",
+          "query": "status=500"
+        },
+        "condition": {
+          "window": "1m",
+          "interval": "1m",
+          "operator": "gt",
+          "threshold": 5
+        }
+      }
+    }
+  ]}
+]'
 
-# Update the api-service component to have the metric-based memory alert trait
-kubectl apply -f openchoreo/alerting-demo/api-service-component.yaml
-
-# Enable the frontend log alert, AI RCA, and notification channel
+# Enable the alert, AI RCA, and notification channel
 kubectl apply -f openchoreo/alerting-demo/enable-alert.yaml
 ```
 
-### Failure Scenarios
+### Trigger the Alert
 
-There are two failure scenarios, applied separately:
-
-**1. Log-based alert (misconfigured Postgres DSN)**
-
-The `failure-scenario-setup.yaml` misconfigures the api-service's `POSTGRES_DSN` to point to a non-existent host. The api-service starts but every DB query fails, returning 500s. The frontend logs `"upstream error"` on each proxied request, breaching the alert threshold. The RCA agent then traces from the frontend alert → api-service 500s → Postgres connection errors → misconfigured DSN.
+`failure-scenario.yaml` misconfigures the api-service's `POSTGRES_DSN` to point to a non-existent host. The api-service starts but every DB query fails, returning 500s. The frontend logs `"upstream error"` on each proxied request, breaching the alert threshold. The RCA agent then traces from the frontend alert → api-service 500s → Postgres connection errors → misconfigured DSN.
 
 ```bash
 # Start generating traffic (creates 3 short URLs, then visits them every 2s)
-chmod +x openchoreo/alerting-demo/trigger-alerts.sh
 bash openchoreo/alerting-demo/trigger-alerts.sh
 
 # For a remote cluster, pass the BFF URL as an argument
 bash openchoreo/alerting-demo/trigger-alerts.sh http://<your-bff-host>
 ```
 
-Confirm load is being generated at http://frontend-development-default.openchoreoapis.localhost:19080/
-
 ```bash
-# Apply the failure scenario (misconfigures Postgres DSN + lowers api-service memory to 55Mi)
-kubectl apply -f openchoreo/alerting-demo/failure-scenario-setup.yaml
+# Inject the misconfigured Postgres DSN
+kubectl apply -f openchoreo/alerting-demo/failure-scenario.yaml
 ```
 
-After the alert fires, fix the misconfigured DSN before moving to scenario 2:
+After the alert fires, revert:
 
 ```bash
 kubectl patch releasebinding api-service-development --type=json \
   -p '[{"op":"remove","path":"/spec/workloadOverrides"}]'
-```
-
-**2. Metric-based alert (high memory under load)**
-
-The same `failure-scenario-setup.yaml` also lowers the api-service memory limit to 55Mi. Under idle load the service uses ~7 MB (~13%), but under heavy traffic it climbs to ~40 MB (~72%), well above the 35% threshold. Use `generate-load.sh` to drive the traffic:
-
-```bash
-chmod +x openchoreo/alerting-demo/generate-load.sh
-bash openchoreo/alerting-demo/generate-load.sh
-
-# For a remote cluster, pass the BFF URL after the concurrency and flags
-bash openchoreo/alerting-demo/generate-load.sh 50 http://<your-bff-host>
 ```
 
 ## Cleanup

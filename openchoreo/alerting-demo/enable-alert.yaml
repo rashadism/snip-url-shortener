@@ -1,5 +1,5 @@
 ---
-# Enable the alert, AI RCA, and notification channel on the frontend
+# Enable the log-based alert, AI RCA, and notification channel on the frontend
 apiVersion: openchoreo.dev/v1alpha1
 kind: ReleaseBinding
 metadata:

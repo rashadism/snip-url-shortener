@@ -1,5 +1,6 @@
 ---
-# Misconfigure the api-service Postgres DSN and lower memory limits to trigger memory alert
+# Misconfigure the api-service Postgres DSN to point to a non-existent host
+# This causes all DB queries to fail, returning 500s that trigger the frontend log alert
 apiVersion: openchoreo.dev/v1alpha1
 kind: ReleaseBinding
 metadata:
@@ -15,14 +16,3 @@ spec:
       env:
         - key: POSTGRES_DSN
           value: "postgres://postgres:postgres@postgresss:5432/urlshortener?sslmode=disable"
-  componentTypeEnvOverrides:
-    resources:
-      requests:
-        memory: "40Mi"
-      limits:
-        memory: "55Mi"
-  traitOverrides:
-    api-service-high-memory-alert:
-      enabled: true
-      enableAiRootCauseAnalysis: true
-      notificationChannel: "webhook-notification-channel-development"
