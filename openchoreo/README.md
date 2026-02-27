@@ -64,10 +64,10 @@ kubectl apply -f openchoreo/alerting-demo/enable-alert.yaml
 `failure-scenario.yaml` misconfigures the api-service's `POSTGRES_DSN` to point to a non-existent host. The api-service starts but every DB query fails, returning 500s. The frontend logs `"upstream error"` on each proxied request, breaching the alert threshold. The RCA agent then traces from the frontend alert → api-service 500s → Postgres connection errors → misconfigured DSN.
 
 ```bash
-# Start generating traffic (creates 3 short URLs, then visits them every 2s)
+# Start generating traffic (auto-detects the frontend URL from the ReleaseBinding)
 bash openchoreo/alerting-demo/trigger-alerts.sh
 
-# For a remote cluster, pass the BFF URL as an argument
+# Or pass a custom URL
 bash openchoreo/alerting-demo/trigger-alerts.sh http://<your-bff-host>
 ```
 

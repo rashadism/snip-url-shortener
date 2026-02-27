@@ -56,4 +56,11 @@ Schema is in `db/init.sql`, baked into a custom postgres image (`db/Dockerfile`)
 
 ## OpenChoreo Deployment
 
-Manifests live in `openchoreo/`. Each source-based service has a `workload.yaml` descriptor alongside its Dockerfile defining endpoints and env vars (`configurations.env`). Service discovery in OpenChoreo uses `<component-name>:80` regardless of the container's actual port. Redis is the only image-based component; everything else builds from source via the `docker` workflow pointing at `github.com/rashadism/snip-url-shortener`.
+Manifests live in `openchoreo/` with two deployment modes:
+
+- **`from-image/`** — Component + Workload YAMLs using pre-built Docker images (`rashadxyz/snip-*`)
+- **`from-source/`** — Component + ComponentWorkflowRun YAMLs that build from `github.com/rashadism/snip-url-shortener` via the `docker` workflow
+
+Service discovery in OpenChoreo uses `<component-name>:80` regardless of the container's actual port. Connections between services are declared in Workload manifests (from-image) or injected at runtime (from-source).
+
+**`alerting-demo/`** contains resources for demonstrating observability alerting (notification channels, ReleaseBindings, traffic scripts). Alert traits are patched onto components via `kubectl patch` rather than baked into the base manifests, so the demo works with either deployment mode.

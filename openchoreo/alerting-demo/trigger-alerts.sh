@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # Generates traffic against the BFF to create short URLs and simulate visits.
 # Usage:
-#   bash trigger-alerts.sh                              # default BFF
+#   bash trigger-alerts.sh                              # auto-detect from ReleaseBinding
 #   bash trigger-alerts.sh -v                           # verbose
 #   bash trigger-alerts.sh http://localhost:9700         # custom BFF URL
 #   bash trigger-alerts.sh -v http://localhost:9700      # both
 
 VERBOSE=false
-BFF="http://frontend-development-default.openchoreoapis.localhost:19080"
+BFF=""
 
 for arg in "$@"; do
   case "$arg" in
@@ -16,6 +16,19 @@ for arg in "$@"; do
   esac
 done
 
+if [ -z "$BFF" ]; then
+  HOST=$(kubectl get releasebinding frontend-development -o yaml | yq '.status.endpoints[] | .externalURLs.http.host')
+  PORT=$(kubectl get releasebinding frontend-development -o yaml | yq '.status.endpoints[] | .externalURLs.http.port')
+  if [ -n "$HOST" ] && [ -n "$PORT" ]; then
+    BFF="http://${HOST}:${PORT}"
+  else
+    echo "Could not detect frontend URL. Pass it as an argument:"
+    echo "  bash trigger-alerts.sh http://<your-bff-host>"
+    exit 1
+  fi
+fi
+
+echo "=== BFF: $BFF ==="
 echo "=== Waiting for API to be healthy ==="
 until curl -s "$BFF/api/urls?username=_ping" 2>/dev/null | grep -q '^\['; do
   sleep 2
