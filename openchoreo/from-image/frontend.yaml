@@ -39,26 +39,18 @@ spec:
       port: 3000
       visibility: [external]
   connections:
-    api-service:
-      type: api
-      params:
-        projectName: url-shortener
-        componentName: api-service
-        endpoint: http
-      inject:
-        env:
-          - name: API_SERVICE_URL
-            value: "http://{{ .host }}:{{ .port }}"
-    analytics-service:
-      type: api
-      params:
-        projectName: url-shortener
-        componentName: analytics-service
-        endpoint: http
-      inject:
-        env:
-          - name: ANALYTICS_SERVICE_URL
-            value: "http://{{ .host }}:{{ .port }}"
+    - project: url-shortener
+      component: api-service
+      endpoint: http
+      visibility: project
+      envBindings:
+        address: API_SERVICE_ADDR
+    - project: url-shortener
+      component: analytics-service
+      endpoint: http
+      visibility: project
+      envBindings:
+        address: ANALYTICS_SERVICE_ADDR
   container:
     image: rashadxyz/snip-frontend:v0.2.5
     env:

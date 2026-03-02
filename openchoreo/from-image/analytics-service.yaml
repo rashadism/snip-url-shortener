@@ -39,26 +39,18 @@ spec:
       type: HTTP
       port: 8081
   connections:
-    postgres:
-      type: api
-      params:
-        projectName: url-shortener
-        componentName: postgres
-        endpoint: tcp
-      inject:
-        env:
-          - name: POSTGRES_DSN
-            value: "postgres://postgres:postgres@{{ .host }}:{{ .port }}/urlshortener?sslmode=disable"
-    redis:
-      type: api
-      params:
-        projectName: url-shortener
-        componentName: redis
-        endpoint: tcp
-      inject:
-        env:
-          - name: REDIS_ADDR
-            value: "{{ .host }}:{{ .port }}"
+    - project: url-shortener
+      component: postgres
+      endpoint: tcp
+      visibility: project
+      envBindings:
+        address: POSTGRES_ADDR
+    - project: url-shortener
+      component: redis
+      endpoint: tcp
+      visibility: project
+      envBindings:
+        address: REDIS_ADDR
   container:
     image: rashadxyz/snip-analytics-service:v0.2.5
     env:
