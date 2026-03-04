@@ -21,7 +21,7 @@ spec:
       repository:
         url: "https://github.com/rashadism/snip-url-shortener"
         revision:
-          branch: "main"
+          branch: "v17"
         appPath: "/analytics-service"
       docker:
         context: "/analytics-service"
@@ -46,7 +46,7 @@ spec:
       repository:
         url: "https://github.com/rashadism/snip-url-shortener"
         revision:
-          branch: "main"
+          branch: "v17"
         appPath: "/analytics-service"
       docker:
         context: "/analytics-service"
