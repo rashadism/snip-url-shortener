@@ -2,7 +2,6 @@ apiVersion: openchoreo.dev/v1alpha1
 kind: Component
 metadata:
   name: api-service
-  namespace: default
 spec:
   owner:
     projectName: url-shortener
@@ -15,51 +14,40 @@ spec:
   workflow:
     name: docker
 
-    systemParameters:
+    parameters:
+      scope:
+        projectName: "url-shortener"
+        componentName: "api-service"
       repository:
         url: "https://github.com/rashadism/snip-url-shortener"
         revision:
           branch: "main"
         appPath: "/api-service"
-
-    parameters:
       docker:
         context: "/api-service"
         filePath: "/api-service/Dockerfile"
 
-  parameters:
-    exposed: true
-    replicas: 1
-    port: 8080
-    resources:
-      requests:
-        cpu: "100m"
-        memory: "256Mi"
-      limits:
-        cpu: "500m"
-        memory: "512Mi"
-
 ---
 apiVersion: openchoreo.dev/v1alpha1
-kind: ComponentWorkflowRun
+kind: WorkflowRun
 metadata:
   name: api-service-build-01
+  labels:
+    openchoreo.dev/project: "url-shortener"
+    openchoreo.dev/component: "api-service"
 spec:
-  owner:
-    projectName: url-shortener
-    componentName: api-service
-
   workflow:
     name: docker
 
-    systemParameters:
+    parameters:
+      scope:
+        projectName: "url-shortener"
+        componentName: "api-service"
       repository:
         url: "https://github.com/rashadism/snip-url-shortener"
         revision:
           branch: "main"
         appPath: "/api-service"
-
-    parameters:
       docker:
         context: "/api-service"
         filePath: "/api-service/Dockerfile"

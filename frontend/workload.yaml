@@ -7,29 +7,20 @@ endpoints:
   - name: webapp
     port: 3000
     type: HTTP
-    visibility: [external]
+    visibility:
+      - external
 
 connections:
-  - name: api-service
-    type: api
-    params:
-      projectName: url-shortener
-      componentName: api-service
-      endpoint: api
-    inject:
-      env:
-        - name: API_SERVICE_URL
-          value: "http://{{ .host }}:{{ .port }}"
-  - name: analytics-service
-    type: api
-    params:
-      projectName: url-shortener
-      componentName: analytics-service
-      endpoint: analytics
-    inject:
-      env:
-        - name: ANALYTICS_SERVICE_URL
-          value: "http://{{ .host }}:{{ .port }}"
+  - component: api-service
+    endpoint: api
+    visibility: project
+    envBindings:
+      address: API_SERVICE_URL
+  - component: analytics-service
+    endpoint: analytics-api
+    visibility: project
+    envBindings:
+      address: ANALYTICS_SERVICE_URL
 
 configurations:
   env:

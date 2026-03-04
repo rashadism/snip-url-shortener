@@ -6,29 +6,20 @@ metadata:
 endpoints:
   - name: api
     port: 8080
-    type: HTTP
+    type: REST
 
 connections:
-  - name: postgres
-    type: api
-    params:
-      projectName: url-shortener
-      componentName: postgres
-      endpoint: postgres
-    inject:
-      env:
-        - name: POSTGRES_DSN
-          value: "postgres://postgres:postgres@{{ .host }}:{{ .port }}/urlshortener?sslmode=disable"
-  - name: redis
-    type: api
-    params:
-      projectName: url-shortener
-      componentName: redis
-      endpoint: redis
-    inject:
-      env:
-        - name: REDIS_ADDR
-          value: "{{ .host }}:{{ .port }}"
+  - component: postgres
+    endpoint: postgres
+    visibility: project
+    envBindings:
+      host: POSTGRES_HOST
+      port: POSTGRES_PORT
+  - component: redis
+    endpoint: redis
+    visibility: project
+    envBindings:
+      address: REDIS_ADDR
 
 configurations:
   env:

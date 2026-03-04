@@ -2,7 +2,6 @@ apiVersion: openchoreo.dev/v1alpha1
 kind: Component
 metadata:
   name: postgres
-  namespace: default
 spec:
   owner:
     projectName: url-shortener
@@ -15,50 +14,40 @@ spec:
   workflow:
     name: docker
 
-    systemParameters:
+    parameters:
+      scope:
+        projectName: "url-shortener"
+        componentName: "postgres"
       repository:
         url: "https://github.com/rashadism/snip-url-shortener"
         revision:
           branch: "main"
         appPath: "/db"
-
-    parameters:
       docker:
         context: "/db"
         filePath: "/db/Dockerfile"
 
-  parameters:
-    replicas: 1
-    port: 5432
-    resources:
-      requests:
-        cpu: "100m"
-        memory: "256Mi"
-      limits:
-        cpu: "500m"
-        memory: "512Mi"
-
 ---
 apiVersion: openchoreo.dev/v1alpha1
-kind: ComponentWorkflowRun
+kind: WorkflowRun
 metadata:
   name: postgres-build-01
+  labels:
+    openchoreo.dev/project: "url-shortener"
+    openchoreo.dev/component: "postgres"
 spec:
-  owner:
-    projectName: url-shortener
-    componentName: postgres
-
   workflow:
     name: docker
 
-    systemParameters:
+    parameters:
+      scope:
+        projectName: "url-shortener"
+        componentName: "postgres"
       repository:
         url: "https://github.com/rashadism/snip-url-shortener"
         revision:
           branch: "main"
         appPath: "/db"
-
-    parameters:
       docker:
         context: "/db"
         filePath: "/db/Dockerfile"

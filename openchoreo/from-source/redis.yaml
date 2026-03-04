@@ -2,7 +2,6 @@ apiVersion: openchoreo.dev/v1alpha1
 kind: Component
 metadata:
   name: redis
-  namespace: default
 spec:
   owner:
     projectName: url-shortener
@@ -15,50 +14,40 @@ spec:
   workflow:
     name: docker
 
-    systemParameters:
+    parameters:
+      scope:
+        projectName: "url-shortener"
+        componentName: "redis"
       repository:
         url: "https://github.com/rashadism/snip-url-shortener"
         revision:
           branch: "main"
         appPath: "/redis"
-
-    parameters:
       docker:
         context: "/redis"
         filePath: "/redis/Dockerfile"
 
-  parameters:
-    replicas: 1
-    port: 6379
-    resources:
-      requests:
-        cpu: "50m"
-        memory: "128Mi"
-      limits:
-        cpu: "200m"
-        memory: "256Mi"
-
 ---
 apiVersion: openchoreo.dev/v1alpha1
-kind: ComponentWorkflowRun
+kind: WorkflowRun
 metadata:
   name: redis-build-01
+  labels:
+    openchoreo.dev/project: "url-shortener"
+    openchoreo.dev/component: "redis"
 spec:
-  owner:
-    projectName: url-shortener
-    componentName: redis
-
   workflow:
     name: docker
 
-    systemParameters:
+    parameters:
+      scope:
+        projectName: "url-shortener"
+        componentName: "redis"
       repository:
         url: "https://github.com/rashadism/snip-url-shortener"
         revision:
           branch: "main"
         appPath: "/redis"
-
-    parameters:
       docker:
         context: "/redis"
         filePath: "/redis/Dockerfile"

@@ -2,7 +2,6 @@ apiVersion: openchoreo.dev/v1alpha1
 kind: Component
 metadata:
   name: analytics-service
-  namespace: default
 spec:
   owner:
     projectName: url-shortener
@@ -15,51 +14,40 @@ spec:
   workflow:
     name: docker
 
-    systemParameters:
+    parameters:
+      scope:
+        projectName: "url-shortener"
+        componentName: "analytics-service"
       repository:
         url: "https://github.com/rashadism/snip-url-shortener"
         revision:
           branch: "main"
         appPath: "/analytics-service"
-
-    parameters:
       docker:
         context: "/analytics-service"
         filePath: "/analytics-service/Dockerfile"
 
-  parameters:
-    exposed: true
-    replicas: 1
-    port: 8081
-    resources:
-      requests:
-        cpu: "100m"
-        memory: "256Mi"
-      limits:
-        cpu: "500m"
-        memory: "512Mi"
-
 ---
 apiVersion: openchoreo.dev/v1alpha1
-kind: ComponentWorkflowRun
+kind: WorkflowRun
 metadata:
   name: analytics-service-build-01
+  labels:
+    openchoreo.dev/project: "url-shortener"
+    openchoreo.dev/component: "analytics-service"
 spec:
-  owner:
-    projectName: url-shortener
-    componentName: analytics-service
-
   workflow:
     name: docker
 
-    systemParameters:
+    parameters:
+      scope:
+        projectName: "url-shortener"
+        componentName: "analytics-service"
       repository:
         url: "https://github.com/rashadism/snip-url-shortener"
         revision:
           branch: "main"
         appPath: "/analytics-service"
-
-    parameters:
       docker:
         context: "/analytics-service"
         filePath: "/analytics-service/Dockerfile"
