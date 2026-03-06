@@ -21,7 +21,7 @@ spec:
       repository:
         url: "https://github.com/rashadism/snip-url-shortener"
         revision:
-          branch: "v17"
+          branch: "main"
         appPath: "/redis"
       docker:
         context: "/redis"
@@ -46,7 +46,7 @@ spec:
       repository:
         url: "https://github.com/rashadism/snip-url-shortener"
         revision:
-          branch: "v17"
+          branch: "main"
         appPath: "/redis"
       docker:
         context: "/redis"

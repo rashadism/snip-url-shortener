@@ -21,7 +21,7 @@ spec:
       repository:
         url: "https://github.com/rashadism/snip-url-shortener"
         revision:
-          branch: "v17"
+          branch: "main"
         appPath: "/frontend"
       docker:
         context: "/frontend"
@@ -46,7 +46,7 @@ spec:
       repository:
         url: "https://github.com/rashadism/snip-url-shortener"
         revision:
-          branch: "v17"
+          branch: "main"
         appPath: "/frontend"
       docker:
         context: "/frontend"
