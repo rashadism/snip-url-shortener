@@ -1,5 +1,5 @@
 ---
-# Enable the log-based alert, AI RCA, and notification channel on the frontend
+# Enable the log-based alert, incident creation, AI RCA, and notification channel on the frontend
 apiVersion: openchoreo.dev/v1alpha1
 kind: ReleaseBinding
 metadata:
@@ -13,5 +13,10 @@ spec:
   traitOverrides:
     frontend-5xx-log-alert:
       enabled: true
-      enableAiRootCauseAnalysis: true
-      notificationChannel: "webhook-notification-channel-development"
+      actions:
+        notifications:
+          channels:
+            - "webhook-notification-channel-development"
+        incident:
+          enabled: true
+          triggerAiRca: true
