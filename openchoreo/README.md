@@ -66,9 +66,6 @@ kubectl apply -f openchoreo/alerting-demo/enable-alert.yaml
 ```bash
 # Start generating traffic (auto-detects the frontend URL from the ReleaseBinding)
 bash openchoreo/alerting-demo/trigger-alerts.sh
-
-# Or pass a custom URL
-bash openchoreo/alerting-demo/trigger-alerts.sh http://<your-bff-host>
 ```
 
 ```bash
@@ -76,7 +73,7 @@ bash openchoreo/alerting-demo/trigger-alerts.sh http://<your-bff-host>
 kubectl apply -f openchoreo/alerting-demo/failure-scenario.yaml
 ```
 
-After the alert fires, revert:
+After the alert fires, revert by applying the fix from the UI if suggested, or manually:
 
 ```bash
 kubectl patch releasebinding api-service-development --type=json \
