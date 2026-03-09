@@ -9,4 +9,5 @@ metadata:
   name: url-shortener
   namespace: default
 spec:
-  deploymentPipelineRef: default
+  deploymentPipelineRef:
+    name: default

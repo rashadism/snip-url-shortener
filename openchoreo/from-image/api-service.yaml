@@ -38,19 +38,20 @@ spec:
     http:
       type: HTTP
       port: 8080
-  connections:
-    - project: url-shortener
-      component: postgres
-      endpoint: tcp
-      visibility: project
-      envBindings:
-        address: POSTGRES_ADDR
-    - project: url-shortener
-      component: redis
-      endpoint: tcp
-      visibility: project
-      envBindings:
-        address: REDIS_ADDR
+  dependencies:
+    endpoints:
+      - project: url-shortener
+        component: postgres
+        name: tcp
+        visibility: project
+        envBindings:
+          address: POSTGRES_ADDR
+      - project: url-shortener
+        component: redis
+        name: tcp
+        visibility: project
+        envBindings:
+          address: REDIS_ADDR
   container:
     image: rashadxyz/snip-api-service:v0.2.5
     env:
