@@ -54,16 +54,13 @@ echo "wso2.com/choreo -> $CODE3"
 
 CODES=("$CODE1" "$CODE2" "$CODE3")
 
-TIMEOUT=600
-END=$((SECONDS + TIMEOUT))
-
 echo ""
 echo "=== Traffic is flowing ==="
-echo "Visiting a random short URL every 2s for ${TIMEOUT}s... (kill with: kill $$)"
+echo "Visiting a random short URL every 2s... (kill with: kill $$)"
 echo "Visit: $BFF"
 echo ""
 
-while [ $SECONDS -lt $END ]; do
+while true; do
   # Visit a real URL (cached in Redis — always succeeds)
   CODE=${CODES[$((RANDOM % ${#CODES[@]}))]}
   if $VERBOSE; then
@@ -86,4 +83,4 @@ while [ $SECONDS -lt $END ]; do
 done
 
 echo ""
-echo "=== Done (${TIMEOUT}s elapsed) ==="
+echo "=== Done ==="
