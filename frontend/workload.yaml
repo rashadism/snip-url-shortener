@@ -12,12 +12,12 @@ endpoints:
 
 connections:
   - component: api-service
-    endpoint: api
+    name: api
     visibility: project
     envBindings:
       address: API_SERVICE_URL
   - component: analytics-service
-    endpoint: analytics-api
+    name: analytics-api
     visibility: project
     envBindings:
       address: ANALYTICS_SERVICE_URL

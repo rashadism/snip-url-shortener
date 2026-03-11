@@ -2,6 +2,7 @@ apiVersion: openchoreo.dev/v1alpha1
 kind: Component
 metadata:
   name: analytics-service
+  namespace: default
 spec:
   owner:
     projectName: url-shortener
@@ -9,19 +10,17 @@ spec:
   componentType:
     kind: ClusterComponentType
     name: deployment/service
+
   autoDeploy: true
 
   workflow:
-    name: docker
-
+    kind: ClusterWorkflow
+    name: dockerfile-builder
     parameters:
-      scope:
-        projectName: "url-shortener"
-        componentName: "analytics-service"
       repository:
         url: "https://github.com/rashadism/snip-url-shortener"
         revision:
-          branch: "main"
+          branch: "v18"
         appPath: "/analytics-service"
       docker:
         context: "/analytics-service"
@@ -37,16 +36,13 @@ metadata:
     openchoreo.dev/component: "analytics-service"
 spec:
   workflow:
-    name: docker
-
+    kind: ClusterWorkflow
+    name: dockerfile-builder
     parameters:
-      scope:
-        projectName: "url-shortener"
-        componentName: "analytics-service"
       repository:
         url: "https://github.com/rashadism/snip-url-shortener"
         revision:
-          branch: "main"
+          branch: "v18"
         appPath: "/analytics-service"
       docker:
         context: "/analytics-service"
