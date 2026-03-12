@@ -12,18 +12,6 @@ spec:
     name: deployment/service
   autoDeploy: true
 
-  parameters:
-    exposed: true
-    replicas: 1
-    port: 8080
-    resources:
-      requests:
-        cpu: "100m"
-        memory: "256Mi"
-      limits:
-        cpu: "500m"
-        memory: "512Mi"
-
 ---
 apiVersion: openchoreo.dev/v1alpha1
 kind: Workload

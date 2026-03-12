@@ -10,7 +10,7 @@ spec:
     projectName: url-shortener
     componentName: frontend
   environment: development
-  traitOverrides:
+  traitEnvironmentConfigs:
     frontend-5xx-log-alert:
       enabled: true
       actions:

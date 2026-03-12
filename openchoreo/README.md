@@ -35,6 +35,7 @@ kubectl apply -f openchoreo/alerting-demo/alert-notification-channels.yaml
 kubectl patch component frontend --type='json' -p='[
   {"op": "add", "path": "/spec/traits", "value": [
     {
+      "kind": "ClusterTrait",
       "name": "observability-alert-rule",
       "instanceName": "frontend-5xx-log-alert",
       "parameters": {
@@ -90,7 +91,7 @@ kubectl delete -f openchoreo/project.yaml
 
 ## How it works
 
-Source-based components (postgres, api-service, analytics-service, frontend) use the `docker` workflow to build from `github.com/rashadism/snip-url-shortener`. Each service has a `workload.yaml` descriptor that defines its endpoints and environment variables — no env vars are baked into Dockerfiles.
+Source-based components (postgres, api-service, analytics-service, frontend) use the `dockerfile-builder` workflow to build from `github.com/rashadism/snip-url-shortener`. Each service has a `workload.yaml` descriptor that defines its endpoints and environment variables — no env vars are baked into Dockerfiles.
 
 Inter-service communication uses OpenChoreo service discovery (`<component-name>:80`). The frontend proxies all API requests to backend services, so the browser only makes relative requests.
 

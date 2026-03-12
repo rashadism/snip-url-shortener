@@ -12,17 +12,6 @@ spec:
     name: deployment/service
   autoDeploy: true
 
-  parameters:
-    replicas: 1
-    port: 5432
-    resources:
-      requests:
-        cpu: "100m"
-        memory: "256Mi"
-      limits:
-        cpu: "500m"
-        memory: "512Mi"
-
 ---
 apiVersion: openchoreo.dev/v1alpha1
 kind: Workload
