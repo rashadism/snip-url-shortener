@@ -13,8 +13,7 @@ connections:
     name: postgres
     visibility: project
     envBindings:
-      host: POSTGRES_HOST
-      port: POSTGRES_PORT
+      address: PLACEHOLDER
   - component: redis
     name: redis
     visibility: project
@@ -27,8 +26,6 @@ configurations:
       value: "8081"
     - name: POSTGRES_DSN
       value: "postgres://postgres:postgres@postgres:5432/urlshortener?sslmode=disable"
-    - name: REDIS_ADDR
-      value: "redis:6379"
     - name: OTEL_ENABLED
       value: "true"
     - name: OTEL_EXPORTER_ENDPOINT

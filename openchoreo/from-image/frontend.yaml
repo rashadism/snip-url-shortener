@@ -34,22 +34,18 @@ spec:
         name: http
         visibility: project
         envBindings:
-          address: API_SERVICE_ADDR
+          address: API_SERVICE_URL
       - project: url-shortener
         component: analytics-service
         name: http
         visibility: project
         envBindings:
-          address: ANALYTICS_SERVICE_ADDR
+          address: ANALYTICS_SERVICE_URL
   container:
     image: rashadxyz/snip-frontend:v0.2.5
     env:
       - key: PORT
         value: "3000"
-      - key: API_SERVICE_URL
-        value: "http://api-service:8080"
-      - key: ANALYTICS_SERVICE_URL
-        value: "http://analytics-service:8081"
       - key: OTEL_ENABLED
         value: "true"
       - key: OTEL_EXPORTER_ENDPOINT

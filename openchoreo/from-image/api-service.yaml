@@ -33,7 +33,7 @@ spec:
         name: tcp
         visibility: project
         envBindings:
-          address: POSTGRES_ADDR
+          address: PLACEHOLDER
       - project: url-shortener
         component: redis
         name: tcp
@@ -47,8 +47,6 @@ spec:
         value: "8080"
       - key: POSTGRES_DSN
         value: "postgres://postgres:postgres@postgres:5432/urlshortener?sslmode=disable"
-      - key: REDIS_ADDR
-        value: "redis:6379"
       - key: OTEL_ENABLED
         value: "true"
       - key: OTEL_EXPORTER_ENDPOINT
