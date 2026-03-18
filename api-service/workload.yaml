@@ -6,7 +6,7 @@ metadata:
 endpoints:
   - name: api
     port: 8080
-    type: REST
+    type: HTTP
 
 connections:
   - component: postgres

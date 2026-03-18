@@ -6,7 +6,7 @@ metadata:
 endpoints:
   - name: analytics-api
     port: 8081
-    type: REST
+    type: HTTP
 
 connections:
   - component: postgres
