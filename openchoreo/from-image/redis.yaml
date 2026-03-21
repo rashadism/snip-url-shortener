@@ -1,7 +1,7 @@
 apiVersion: openchoreo.dev/v1alpha1
 kind: Component
 metadata:
-  name: redis
+  name: snip-redis
   namespace: default
 spec:
   owner:
@@ -16,11 +16,11 @@ spec:
 apiVersion: openchoreo.dev/v1alpha1
 kind: Workload
 metadata:
-  name: redis
+  name: snip-redis
   namespace: default
 spec:
   owner:
-    componentName: redis
+    componentName: snip-redis
     projectName: url-shortener
   endpoints:
     tcp:

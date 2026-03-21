@@ -4,15 +4,15 @@
 apiVersion: openchoreo.dev/v1alpha1
 kind: ReleaseBinding
 metadata:
-  name: api-service-development
+  name: snip-api-service-development
   namespace: default
 spec:
   owner:
     projectName: url-shortener
-    componentName: api-service
+    componentName: snip-api-service
   environment: development
   workloadOverrides:
     container:
       env:
         - key: POSTGRES_DSN
-          value: "postgres://postgres:postgres@postgresss:5432/urlshortener?sslmode=disable"
+          value: "postgres://postgres:postgres@snip-postgresss:5432/urlshortener?sslmode=disable"

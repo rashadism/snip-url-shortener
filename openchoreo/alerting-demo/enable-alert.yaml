@@ -3,12 +3,12 @@
 apiVersion: openchoreo.dev/v1alpha1
 kind: ReleaseBinding
 metadata:
-  name: frontend-development
+  name: snip-frontend-development
   namespace: default
 spec:
   owner:
     projectName: url-shortener
-    componentName: frontend
+    componentName: snip-frontend
   environment: development
   traitEnvironmentConfigs:
     frontend-5xx-log-alert:

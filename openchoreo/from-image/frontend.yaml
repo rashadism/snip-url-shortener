@@ -1,7 +1,7 @@
 apiVersion: openchoreo.dev/v1alpha1
 kind: Component
 metadata:
-  name: frontend
+  name: snip-frontend
   namespace: default
 spec:
   owner:
@@ -16,11 +16,11 @@ spec:
 apiVersion: openchoreo.dev/v1alpha1
 kind: Workload
 metadata:
-  name: frontend
+  name: snip-frontend
   namespace: default
 spec:
   owner:
-    componentName: frontend
+    componentName: snip-frontend
     projectName: url-shortener
   endpoints:
     http:
@@ -30,13 +30,13 @@ spec:
   dependencies:
     endpoints:
       - project: url-shortener
-        component: api-service
+        component: snip-api-service
         name: http
         visibility: project
         envBindings:
           address: API_SERVICE_URL
       - project: url-shortener
-        component: analytics-service
+        component: snip-analytics-service
         name: http
         visibility: project
         envBindings:

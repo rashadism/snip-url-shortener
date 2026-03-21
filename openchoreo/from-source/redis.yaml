@@ -1,7 +1,7 @@
 apiVersion: openchoreo.dev/v1alpha1
 kind: Component
 metadata:
-  name: redis
+  name: snip-redis
   namespace: default
 spec:
   owner:
@@ -30,10 +30,10 @@ spec:
 apiVersion: openchoreo.dev/v1alpha1
 kind: WorkflowRun
 metadata:
-  name: redis-build-01
+  name: snip-redis-build-01
   labels:
     openchoreo.dev/project: "url-shortener"
-    openchoreo.dev/component: "redis"
+    openchoreo.dev/component: "snip-redis"
 spec:
   workflow:
     kind: ClusterWorkflow

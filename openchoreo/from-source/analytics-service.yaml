@@ -1,7 +1,7 @@
 apiVersion: openchoreo.dev/v1alpha1
 kind: Component
 metadata:
-  name: analytics-service
+  name: snip-analytics-service
   namespace: default
 spec:
   owner:
@@ -30,10 +30,10 @@ spec:
 apiVersion: openchoreo.dev/v1alpha1
 kind: WorkflowRun
 metadata:
-  name: analytics-service-build-01
+  name: snip-analytics-service-build-01
   labels:
     openchoreo.dev/project: "url-shortener"
-    openchoreo.dev/component: "analytics-service"
+    openchoreo.dev/component: "snip-analytics-service"
 spec:
   workflow:
     kind: ClusterWorkflow

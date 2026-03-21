@@ -1,7 +1,7 @@
 apiVersion: openchoreo.dev/v1alpha1
 kind: Component
 metadata:
-  name: postgres
+  name: snip-postgres
   namespace: default
 spec:
   owner:
@@ -30,10 +30,10 @@ spec:
 apiVersion: openchoreo.dev/v1alpha1
 kind: WorkflowRun
 metadata:
-  name: postgres-build-01
+  name: snip-postgres-build-01
   labels:
     openchoreo.dev/project: "url-shortener"
-    openchoreo.dev/component: "postgres"
+    openchoreo.dev/component: "snip-postgres"
 spec:
   workflow:
     kind: ClusterWorkflow

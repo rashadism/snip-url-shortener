@@ -8,24 +8,25 @@ endpoints:
     port: 8081
     type: HTTP
 
-connections:
-  - component: postgres
-    name: postgres
-    visibility: project
-    envBindings:
-      address: PLACEHOLDER
-  - component: redis
-    name: redis
-    visibility: project
-    envBindings:
-      address: REDIS_ADDR
+dependencies:
+  endpoints:
+    - component: snip-postgres
+      name: postgres
+      visibility: project
+      envBindings:
+        address: _
+    - component: snip-redis
+      name: redis
+      visibility: project
+      envBindings:
+        address: REDIS_ADDR
 
 configurations:
   env:
     - name: PORT
       value: "8081"
     - name: POSTGRES_DSN
-      value: "postgres://postgres:postgres@postgres:5432/urlshortener?sslmode=disable"
+      value: "postgres://postgres:postgres@snip-postgres:5432/urlshortener?sslmode=disable"
     - name: OTEL_ENABLED
       value: "true"
     - name: OTEL_EXPORTER_ENDPOINT

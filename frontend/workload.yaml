@@ -10,17 +10,18 @@ endpoints:
     visibility:
       - external
 
-connections:
-  - component: api-service
-    name: api
-    visibility: project
-    envBindings:
-      address: API_SERVICE_URL
-  - component: analytics-service
-    name: analytics-api
-    visibility: project
-    envBindings:
-      address: ANALYTICS_SERVICE_URL
+dependencies:
+  endpoints:
+    - component: snip-api-service
+      name: api
+      visibility: project
+      envBindings:
+        address: API_SERVICE_URL
+    - component: snip-analytics-service
+      name: analytics-api
+      visibility: project
+      envBindings:
+        address: ANALYTICS_SERVICE_URL
 
 configurations:
   env:

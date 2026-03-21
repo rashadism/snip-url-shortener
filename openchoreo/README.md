@@ -7,7 +7,7 @@
 
 ## Deploy
 
-Deploys five components (postgres, redis, api-service, analytics-service, frontend) using pre-built images:
+Deploys five components (snip-postgres, snip-redis, snip-api-service, snip-analytics-service, snip-frontend) using pre-built images:
 
 ```bash
 kubectl apply -f openchoreo/project.yaml
@@ -32,7 +32,7 @@ A log-based alert rule on the frontend triggers when `status=500` appears more t
 kubectl apply -f openchoreo/alerting-demo/alert-notification-channels.yaml
 
 # Patch the frontend component to add the log-based alert trait
-kubectl patch component frontend --type='json' -p='[
+kubectl patch component snip-frontend --type='json' -p='[
   {"op": "add", "path": "/spec/traits", "value": [
     {
       "kind": "ClusterTrait",
@@ -77,7 +77,7 @@ kubectl apply -f openchoreo/alerting-demo/failure-scenario.yaml
 After the alert fires, revert by applying the fix from the UI if suggested, or manually:
 
 ```bash
-kubectl patch releasebinding api-service-development --type=json \
+kubectl patch releasebinding snip-api-service-development --type=json \
   -p '[{"op":"remove","path":"/spec/workloadOverrides"}]'
 ```
 
@@ -91,7 +91,7 @@ kubectl delete -f openchoreo/project.yaml
 
 ## How it works
 
-Source-based components (postgres, api-service, analytics-service, frontend) use the `dockerfile-builder` workflow to build from `github.com/rashadism/snip-url-shortener`. Each service has a `workload.yaml` descriptor that defines its endpoints and environment variables — no env vars are baked into Dockerfiles.
+Source-based components (snip-postgres, snip-api-service, snip-analytics-service, snip-frontend) use the `dockerfile-builder` workflow to build from `github.com/rashadism/snip-url-shortener`. Each service has a `workload.yaml` descriptor that defines its endpoints and environment variables — no env vars are baked into Dockerfiles.
 
 Inter-service communication uses OpenChoreo service discovery (`<component-name>:80`). The frontend proxies all API requests to backend services, so the browser only makes relative requests.
 

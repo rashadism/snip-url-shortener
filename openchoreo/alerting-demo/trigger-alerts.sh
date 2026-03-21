@@ -17,8 +17,8 @@ for arg in "$@"; do
 done
 
 if [ -z "$BFF" ]; then
-  HOST=$(kubectl get releasebinding frontend-development -o yaml | yq '.status.endpoints[] | .externalURLs.http.host')
-  PORT=$(kubectl get releasebinding frontend-development -o yaml | yq '.status.endpoints[] | .externalURLs.http.port')
+  HOST=$(kubectl get releasebinding snip-frontend-development -o yaml | yq '.status.endpoints[] | .externalURLs.http.host')
+  PORT=$(kubectl get releasebinding snip-frontend-development -o yaml | yq '.status.endpoints[] | .externalURLs.http.port')
   if [ -n "$HOST" ] && [ -n "$PORT" ]; then
     BFF="http://${HOST}:${PORT}"
   else
